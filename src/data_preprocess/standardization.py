@@ -5,9 +5,9 @@ import os
 import argparse
 from pandas import DataFrame
 
-from chord_type import conversor_tipo_acorde_triade, conversor_tipo_acorde_setima
-
-parser = argparse.ArgumentParser(description="Sanitiza raw data considering chord types")
+parser = argparse.ArgumentParser(
+    description="Standardization of raw data considering chord types"
+)
 parser.add_argument(
     "--chord_type",
     type=str,
@@ -29,6 +29,102 @@ ACORDE = args.chord_type
 PORCENTAGEM_BD = args.db_percentage
 # Duração da semibreve (x)
 SEMIBREVE = args.semibreve
+
+
+def conversor_tipo_acorde_triade(chord):
+    """Simplificacao dos tipos de acorde: maiores e menores"""
+    return {
+        "maj": "maj",
+        "major": "maj",
+        "major-sixth": "maj",
+        "major-seventh": "maj",
+        "maj7": "maj",
+        "major-ninth": "maj",
+        "maj69": "maj",
+        "maj9": "maj",
+        "major-minor": "maj",
+        "minor": "min",
+        "min": "min",
+        "minor-sixth": "min",
+        "minor-seventh": "min",
+        "min7": "min",
+        "minor-ninth": "min",
+        "minor-11th": "min",
+        "minor-13th": "min",
+        "minor-major": "min",
+        "minMaj7": "min",
+        "6": "maj",
+        "7": "maj",
+        "9": "maj",
+        "dominant": "maj",
+        "dominant-seventh": "maj",
+        "dominant-ninth": "maj",
+        "dominant-11th": "maj",
+        "dominant-13th": "maj",
+        "augmented": "maj",
+        "aug": "maj",
+        "augmented-seventh": "maj",
+        "augmented-ninth": "maj",
+        "dim": "min",
+        "diminished": "min",
+        "diminished-seventh": "min",
+        "half-diminished": "min",
+        "m7b5": "min",
+        "dim7": "min",
+        " dim7": "min",
+        "suspended-second": "maj",
+        "suspended-fourth": "maj",
+        "sus47": "maj",
+        "power": "maj",
+    }.get(chord, "nan")
+
+
+def conversor_tipo_acorde_setima(chord):
+    """Simplificacao dos tipos de acorde: maiores e menores"""
+    return {
+        "maj": "maj",
+        "major": "maj",
+        "major-sixth": "maj",
+        "major-seventh": "maj",
+        "maj7": "7",
+        "major-ninth": "maj",
+        "maj69": "maj",
+        "maj9": "maj",
+        "major-minor": "maj",
+        "minor": "min",
+        "min": "min",
+        "minor-sixth": "min",
+        "minor-seventh": "min",
+        "min7": "7",
+        "minor-ninth": "min",
+        "minor-11th": "min",
+        "minor-13th": "min",
+        "minor-major": "min",
+        "minMaj7": "min",
+        "6": "maj",
+        "7": "7",
+        "9": "maj",
+        "dominant": "maj",
+        "dominant-seventh": "7",
+        "dominant-ninth": "maj",
+        "dominant-11th": "maj",
+        "dominant-13th": "maj",
+        "augmented": "maj",
+        "aug": "maj",
+        "augmented-seventh": "maj",
+        "augmented-ninth": "maj",
+        "dim": "min",
+        "diminished": "min",
+        "diminished-seventh": "min",
+        "half-diminished": "min",
+        "m7b5": "min",
+        "dim7": "min",
+        " dim7": "min",
+        "suspended-second": "maj",
+        "suspended-fourth": "maj",
+        "sus47": "maj",
+        "power": "maj",
+    }.get(chord, "nan")
 
 
 def traduz_indice(raiz):
@@ -119,17 +215,17 @@ def calculador_transposicao(tom):
     }.get(tom, "nan")
 
 
-def main():
+def standardization():
     # de acordo com padrão da base de dados
     normalizador_bd = 16 / SEMIBREVE
 
     caminho = "data/raw/*.csv"
-    novo_caminho = "data/preprocessed/"
+    novo_caminho = "data/standarlized/"
 
     # Encontra todos arquivos no caminho especificado
     arquivos_csv = glob.glob(caminho)
     limite = int(len(arquivos_csv) * PORCENTAGEM_BD)
-    print("Processando " + str(limite) + " arquivos...")
+    print("Padronizando " + str(limite) + " arquivos...")
 
     # Remoção de anteriores
     arquivos_antigos = glob.glob(novo_caminho + "*")
@@ -144,7 +240,7 @@ def main():
         # pega somente nome do arquivo
         # o indice eh usado indiretamente aqui
         nome_arquivo = ntpath.basename(caminho_csv)
-        print("Processando: " + nome_arquivo, "(" + str(i + 1) + ")")
+        print("Padronizando: " + nome_arquivo, "(" + str(i + 1) + ")")
 
         # abre arquivo csv como leitura
         csv_aberto = open(caminho_csv, "r", encoding="utf-8")
@@ -246,4 +342,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    standardization()
