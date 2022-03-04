@@ -7,7 +7,7 @@ from pandas import DataFrame
 
 from chord_type import conversor_tipo_acorde_triade, conversor_tipo_acorde_setima
 
-parser = argparse.ArgumentParser(description="Preprocess data considering chord types")
+parser = argparse.ArgumentParser(description="Sanitiza raw data considering chord types")
 parser.add_argument(
     "--chord_type",
     type=str,
