@@ -22,7 +22,7 @@ FILTRO_CAMPO_HARMONICO = args.hf
 SEMIBREVE = 96.0
 
 def filter():
-    caminho = "data/standarlized/*.csv"
+    caminho = "data/standardized/*.csv"
     novo_caminho = "data/filtered/"
 
     campo_harmonico = [

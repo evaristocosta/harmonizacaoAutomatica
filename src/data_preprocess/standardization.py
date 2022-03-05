@@ -220,7 +220,7 @@ def standardization():
     normalizador_bd = 16 / SEMIBREVE
 
     caminho = "data/raw/*.csv"
-    novo_caminho = "data/standarlized/"
+    novo_caminho = "data/standardized/"
 
     # Encontra todos arquivos no caminho especificado
     arquivos_csv = glob.glob(caminho)
