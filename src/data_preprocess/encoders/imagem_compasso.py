@@ -1,59 +1,14 @@
 import csv
 import numpy as np
 from npy_append_array import NpyAppendArray
+from math import modf
+from .dictionary import dicio_notas, dicio_acordes
+from .one_hot_function import codificacao_one_hot
 
-
-# dicionario de notas e acordes: correspondem com todas possibilidades do banco de dados processado
-dicio_notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "rest"]
-dicio_acordes = [
-    "C:maj",
-    "C:min",
-    "C#:maj",
-    "C#:min",
-    "D:maj",
-    "D:min",
-    "D#:maj",
-    "D#:min",
-    "E:maj",
-    "E:min",
-    "F:maj",
-    "F:min",
-    "F#:maj",
-    "F#:min",
-    "G:maj",
-    "G:min",
-    "G#:maj",
-    "G#:min",
-    "A:maj",
-    "A:min",
-    "A#:maj",
-    "A#:min",
-    "B:maj",
-    "B:min",
-]
-
-
-
+PRECISAO = 0.000001
 
 
 def codificacao_nota(nota, oitava, resto, indice):
-    # dicionario de notas
-    dicio_notas = [
-        "C",
-        "C#",
-        "D",
-        "D#",
-        "E",
-        "F",
-        "F#",
-        "G",
-        "G#",
-        "A",
-        "A#",
-        "B",
-        "rest",
-    ]
-
     # pega tamanho do dicionario (menos pausa)
     dicio_notas_tamanho = len(dicio_notas) - 1
 
@@ -68,10 +23,10 @@ def codificacao_nota(nota, oitava, resto, indice):
     if nota != "rest":
         vetor[nota_indice] = 1
 
-    # razão considerando 10 oitavas (int(255/10))
-    razao = 25
+    # razão considerando 10 oitavas (int(255/10)) ou 1/10
+    razao = 1/10
 
-    alfa = 255
+    alfa = 1
     cod_nota = []
     cod_nota_primeira = []
     cod_nota_final = []
@@ -82,15 +37,15 @@ def codificacao_nota(nota, oitava, resto, indice):
             cod_nota_primeira.append([0, 0, 0, alfa])
             cod_nota_final.append([0, 0, 0, alfa])
         else:
-            cod_nota.append([0, 0, razao * int(oitava), alfa])
-            cod_nota_primeira.append([0, 0, razao * int(oitava), alfa])
+            cod_nota.append([0, 0, razao * float(oitava), alfa])
+            cod_nota_primeira.append([0, 0, razao * float(oitava), alfa])
             cod_nota_final.append(
-                [razao * int(oitava), 0, 0, round(alfa * resto) if resto != 0 else alfa]
+                [1, 0, 0, alfa * resto if resto != 0 else alfa]
             )
 
     # se for apogiatura, marca como verde
     if indice is not None:
-        cod_nota_primeira[indice] = [0, razao * int(oitava), 0, alfa]
+        cod_nota_primeira[indice] = [0, razao * float(oitava), 0, alfa]
 
     # alargador
     cod_nota = [item for item in cod_nota for _ in range(8)]
@@ -126,58 +81,21 @@ def cria_sequencia_notas(primeira_nota, nota, ultima_nota, quantidade):
     return sequencia
 
 
-def codificacao_acorde_one_hot(acorde):
-    dicio_acordes = [
-        "C:maj",
-        "C:min",
-        "C#:maj",
-        "C#:min",
-        "D:maj",
-        "D:min",
-        "D#:maj",
-        "D#:min",
-        "E:maj",
-        "E:min",
-        "F:maj",
-        "F:min",
-        "F#:maj",
-        "F#:min",
-        "G:maj",
-        "G:min",
-        "G#:maj",
-        "G#:min",
-        "A:maj",
-        "A:min",
-        "A#:maj",
-        "A#:min",
-        "B:maj",
-        "B:min",
-    ]
-    dicio_acordes_tamanho = len(dicio_acordes)
-    acorde_indice = dicio_acordes.index(acorde)
-
-    vetor_acorde = [0] * dicio_acordes_tamanho
-    vetor_acorde[acorde_indice] = 1
-    return vetor_acorde
-
-
 def processamento_ic(arquivos_csv):
-    PRECISAO = 0.000001
-    from math import modf
+    dicio_acordes_tamanho = len(dicio_acordes)
 
-    # declaracao das listas usadas durante o processamento
-    # a mesma lista de treino é usada para processar o conjunto de validacao
+    # declaracao das matrizes
     matriz_dados_entrada = []
     matriz_dados_saida = []
 
     # arquivos de salvamento
-    vetor_entrada = NpyAppendArray("vetor_entrada.npy")
-    vetor_saida = NpyAppendArray("vetor_saida.npy")
+    vetor_entrada = NpyAppendArray("data/encoded/vetor_entrada.npy")
+    vetor_saida = NpyAppendArray("data/encoded/vetor_saida.npy")
 
     # construcao das matrizes a partir dos arquivos csv
-    # logica como do processamento
     for i, caminho_csv in enumerate(arquivos_csv):
         print(caminho_csv, "--", i + 1)
+
         csv_aberto = open(caminho_csv, "r", encoding="utf-8")
         next(csv_aberto)
         leitor = csv.reader(csv_aberto)
@@ -198,7 +116,6 @@ def processamento_ic(arquivos_csv):
             acorde = linha[1]
             nota = linha[2]
             oitava = linha[3]
-            # normaliza pra padrão definido de seminima
             duracao = float(linha[4])
 
             resto, inteiro = modf(duracao)
@@ -214,23 +131,10 @@ def processamento_ic(arquivos_csv):
             if controle_resto < PRECISAO:
                 controle_resto = 0
 
-            # appogiatura
+            # appoggiatura
             if duracao == 0:
                 indice = dicio_notas.index(nota)
                 continue
-
-            if controle_resto > 0:
-                print(
-                    "---",
-                    caminho_csv,
-                    "--",
-                    i + 1,
-                    "--",
-                    controle_resto,
-                    "(compasso:",
-                    compasso,
-                    ")",
-                )
 
             # codificacao da nota em forma de linha de pixels
             (
@@ -270,7 +174,8 @@ def processamento_ic(arquivos_csv):
                 )
 
             # gera acorde depois de verificar o compasso
-            cod_vetor_acorde = codificacao_acorde_one_hot(acorde)
+            acorde_indice = dicio_acordes.index(acorde)
+            cod_vetor_acorde = codificacao_one_hot(dicio_acordes_tamanho, acorde_indice)
 
             # atualiza variavel de compasso e repete
             compasso_anterior = compasso
@@ -291,4 +196,3 @@ def processamento_ic(arquivos_csv):
         matriz_dados_saida = []
 
         csv_aberto.close()
-

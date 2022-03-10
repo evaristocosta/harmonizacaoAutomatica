@@ -7,17 +7,19 @@ from pandas import DataFrame
 
 parser = argparse.ArgumentParser(description="Filter for standalized data")
 parser.add_argument(
-    "-em",
+    "--not-empty",
+    help="Não remover compassos vazios",
     action="store_false",
 )
 parser.add_argument(
     "-hf",
+    help="Remover acordes fora do campo harmônico",
     action="store_true",
 )
 
 args = parser.parse_args()
 
-FILTRO_COMPASSO_VAZIO = args.em
+FILTRO_COMPASSO_VAZIO = args.not_empty
 FILTRO_CAMPO_HARMONICO = args.hf
 SEMIBREVE = 96.0
 

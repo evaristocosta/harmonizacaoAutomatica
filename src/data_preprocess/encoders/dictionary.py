@@ -1,0 +1,28 @@
+# dicionario de notas e acordes: correspondem com todas possibilidades do banco de dados processado
+dicio_notas = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "rest"]
+dicio_acordes = [
+    "C:maj",
+    "C:min",
+    "C#:maj",
+    "C#:min",
+    "D:maj",
+    "D:min",
+    "D#:maj",
+    "D#:min",
+    "E:maj",
+    "E:min",
+    "F:maj",
+    "F:min",
+    "F#:maj",
+    "F#:min",
+    "G:maj",
+    "G:min",
+    "G#:maj",
+    "G#:min",
+    "A:maj",
+    "A:min",
+    "A#:maj",
+    "A#:min",
+    "B:maj",
+    "B:min",
+]

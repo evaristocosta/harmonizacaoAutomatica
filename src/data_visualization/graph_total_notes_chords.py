@@ -169,6 +169,10 @@ def graph_total_notes_chords():
             for total in total_acordes_menores_organizado
         ]
 
+    print("\nTotal de notas:", total_notas_organizado)
+    print("Total de acordes maiores:", total_acordes_maiores_organizado)
+    print("Total de acordes menores:", total_acordes_menores_organizado)
+
     plot_graph(
         total_notas_organizado,
         total_acordes_maiores_organizado,
