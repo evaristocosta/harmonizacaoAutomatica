@@ -1,9 +1,8 @@
-from tensorflow.keras.optimizers import SGD, Adam
-import tensorflow as tf
 
+import tensorflow as tf
 # https://github.com/PetraVidnerova/rbf_keras
 from keras import backend as K
-from keras.engine.topology import Layer
+from tensorflow.keras.layers import Layer
 from keras.initializers import RandomUniform, Initializer, Constant
 import pandas as pd
 import numpy as np
@@ -13,8 +12,9 @@ from keras.layers import (
     Dense,
 )
 
+
 class InitCentersRandom(Initializer):
-    """ Initializer for initialization of centers of RBF network
+    """Initializer for initialization of centers of RBF network
         as random samples from the given data set.
 
     # Arguments
@@ -36,7 +36,7 @@ class InitCentersRandom(Initializer):
 
 
 class RBFLayer(Layer):
-    """ Layer of Gaussian RBF units.
+    """Layer of Gaussian RBF units.
 
     # Example
 
@@ -69,23 +69,26 @@ class RBFLayer(Layer):
 
     def build(self, input_shape):
 
-        self.centers = self.add_weight(name='centers',
-                                       shape=(self.output_dim, input_shape[1]),
-                                       initializer=self.initializer,
-                                       trainable=True)
-        self.betas = self.add_weight(name='betas',
-                                     shape=(self.output_dim,),
-                                     initializer=Constant(
-                                         value=self.init_betas),
-                                     # initializer='ones',
-                                     trainable=True)
+        self.centers = self.add_weight(
+            name="centers",
+            shape=(self.output_dim, input_shape[1]),
+            initializer=self.initializer,
+            trainable=True,
+        )
+        self.betas = self.add_weight(
+            name="betas",
+            shape=(self.output_dim,),
+            initializer=Constant(value=self.init_betas),
+            # initializer='ones',
+            trainable=True,
+        )
 
         super(RBFLayer, self).build(input_shape)
 
     def call(self, x):
 
         C = K.expand_dims(self.centers)
-        H = K.transpose(C-K.transpose(x))
+        H = K.transpose(C - K.transpose(x))
         return K.exp(-self.betas * K.sum(H**2, axis=1))
 
         # C = self.centers[np.newaxis, :, :]
@@ -100,20 +103,21 @@ class RBFLayer(Layer):
 
     def get_config(self):
         # have to define get_config to be able to use model_from_json
-        config = {
-            'output_dim': self.output_dim
-        }
+        config = {"output_dim": self.output_dim}
         base_config = super(RBFLayer, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
 
-
-def modelo_rbf(vetorEntrada):
+def model(params, X):
     model = Sequential()
     model.add(Input(shape=(params["input_shape"])))
-    model.add(RBFLayer(params["input_shape"], input_shape=(params["input_shape"],),
-                   initializer=InitCentersRandom(vetorEntrada)
-                   ))
+    model.add(
+        RBFLayer(
+            params["input_shape"],
+            input_shape=(params["input_shape"],),
+            initializer=InitCentersRandom(X),
+        )
+    )
     model.add(Dense(params["output_shape"], activation="softmax"))
-    
+
     return model
