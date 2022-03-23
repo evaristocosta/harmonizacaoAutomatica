@@ -1,1 +1,0 @@
-# faz uso do talos
