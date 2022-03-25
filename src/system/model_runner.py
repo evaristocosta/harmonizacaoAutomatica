@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 import keras
 import tensorflow as tf
-from tensorflow.keras.optimizers import SGD, Adam
+from tensorflow.keras.optimizers import SGD, Adam 
 from keras.callbacks import ModelCheckpoint
 import talos
 
@@ -111,7 +111,7 @@ def model_fit(X_train, Y_train, X_val, Y_val, params):
         optimizer=params["optimizer"](
             lr=talos.utils.lr_normalizer(params["learning_rate"], params["optimizer"])
         ),
-        metrics=["categorical_accuracy"],
+        metrics=["accuracy"],
     )
 
     checkpoint = ModelCheckpoint(
