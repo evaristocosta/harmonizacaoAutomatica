@@ -4,7 +4,10 @@ import keras
 import tensorflow as tf
 from tensorflow.keras.optimizers import SGD, Adam
 from keras.callbacks import ModelCheckpoint
+import talos
+
 from sklearn.metrics import accuracy_score
+
 
 from load_data import carrega
 from models import *
@@ -25,7 +28,6 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-
 MODEL = args.model
 OPTIMIZER = args.optimizer
 
@@ -40,70 +42,43 @@ def fit():
         "output_shape": output_shape,
         "neurons": 128,
         "activation": "relu",
-        "learning_rate": 0.01,
         "batch_size": 128,
         "epochs": 10,
+        "optimizer": Adam,
+        "learning_rate": 0.01,
+        "model": "mlp_1_hidden",
     }
 
     if MODEL != "elm" and MODEL != "esn":
         if MODEL == "mlp_1_hidden":
-            modelo = mlp_1_hidden.model(params)
+            params["model"] = "mlp_1_hidden"
         elif MODEL == "mlp_2_hidden":
-            modelo = mlp_2_hidden.model(params)
+            params["model"] = "mlp_2_hidden"
         elif MODEL == "rbf":
-            modelo = rbf.model(params, X_train)
+            params["model"] = "rbf"
         elif MODEL == "cnn_like_alexnet":
-            modelo = cnn_like_alexnet.model(params)
+            params["model"] = "cnn_like_alexnet"
 
         if OPTIMIZER == "sgd":
-            optimizer = SGD(lr=params["learning_rate"])
+            params["optimizer"] = SGD
         elif OPTIMIZER == "adam":
-            optimizer = Adam(lr=params["learning_rate"])
+            params["optimizer"] = Adam
+        historico, modelo = model_fit(X_train, Y_train, X_val, Y_val, params)
 
-        modelo.compile(
-            loss="categorical_crossentropy",
-            optimizer=optimizer,
-            metrics=["categorical_accuracy"],
-        )
-
-        checkpoint = ModelCheckpoint(
-            "modelo.h5",
-            monitor="val_loss",
-            verbose=1,
-            save_best_only=True,
-            mode="min",
-        )
-
-        historico = modelo.fit(
-            X_train,
-            Y_train,
-            batch_size=params["batch_size"],
-            epochs=params["epochs"],
-            validation_data=(X_val, Y_val),
-            callbacks=[checkpoint],
-        )
-
-        # LOAD BEST MODEL to evaluate the performance of the model
-        modelo.load_weights("modelo.h5")
-
-        metricas = modelo.evaluate(X_test, Y_test, verbose=0)
-        print(
-            f"Resultados:\n {modelo.metrics_names[0]} de {metricas[0]};\n {modelo.metrics_names[1]} de {metricas[1]*100}%"
-        )
     else:
         if MODEL == "elm":
             modelo = elm.ELM(
                 params["input_shape"], params["output_shape"], params["neurons"]
             )
             modelo.train(X_train, Y_train)
-            
+
         elif MODEL == "esn":
             modelo = esn.ESN(
                 n_inputs=params["input_shape"],
                 n_outputs=params["output_shape"],
             )
             modelo.fit(X_train, Y_train)
-        
+
         historico = ""
 
     # igual pra todos
@@ -119,6 +94,47 @@ def fit():
     print("Acerto:", acerto)
 
     return predicao, Y_test, historico
+
+
+def model_fit(X_train, Y_train, X_val, Y_val, params):
+    if params["model"] == "mlp_1_hidden":
+        modelo = mlp_1_hidden.model(params)
+    elif params["model"] == "mlp_2_hidden":
+        modelo = mlp_2_hidden.model(params)
+    elif params["model"] == "rbf":
+        modelo = rbf.model(params, X_train)
+    elif params["model"] == "cnn_like_alexnet":
+        modelo = cnn_like_alexnet.model(params)
+
+    modelo.compile(
+        loss="categorical_crossentropy",
+        optimizer=params["optimizer"](
+            lr=talos.utils.lr_normalizer(params["learning_rate"], params["optimizer"])
+        ),
+        metrics=["categorical_accuracy"],
+    )
+
+    checkpoint = ModelCheckpoint(
+        "modelo.h5",
+        monitor="val_loss",
+        verbose=1,
+        save_best_only=True,
+        mode="min",
+    )
+
+    historico = modelo.fit(
+        X_train,
+        Y_train,
+        batch_size=params["batch_size"],
+        epochs=params["epochs"],
+        validation_data=(X_val, Y_val),
+        callbacks=[checkpoint],
+    )
+
+    # LOAD BEST MODEL to evaluate the performance of the model
+    modelo.load_weights("modelo.h5")
+
+    return historico, modelo
 
 
 if __name__ == "__main__":
