@@ -23,6 +23,7 @@ FILTRO_COMPASSO_VAZIO = args.not_empty
 FILTRO_CAMPO_HARMONICO = args.hf
 SEMIBREVE = 96.0
 
+
 def filter():
     caminho = "data/standardized/*.csv"
     novo_caminho = "data/filtered/"
@@ -103,10 +104,14 @@ def filter():
         # elaboracao da tabela
         df = DataFrame(dados_coletados)
 
-        # verifica existencia da pasta
-        if not os.path.isdir(novo_caminho):
-            os.mkdir(novo_caminho)
-        df.to_csv(novo_caminho + nome_arquivo, encoding="utf-8", index=False)
+        df.to_csv(
+            novo_caminho + "filtrado.csv",
+            encoding="utf-8",
+            index=False,
+            mode="a",
+            header=(i == 0),
+        )
+
 
 if __name__ == "__main__":
     filter()

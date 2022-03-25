@@ -15,31 +15,33 @@ parser.add_argument(
 parser.add_argument(
     "-d",
     help="Qual tipo de dados usar (st: standard, fl: filtered, bl: balanced)",
-    default="st",
-    choices=["st", "fl", "bl"],
+    default="sp",
+    choices=["st", "fl", "bl", "sp"],
 )
 args = parser.parse_args()
 
 DATASET = args.d
 OPTION = args.e
 
+
 def encode():
     # remove anteriores
-    if os.path.isfile('data/encoded/vetor_entrada.npy'):
-        os.remove('data/encoded/vetor_entrada.npy')
-    if os.path.isfile('data/encoded/vetor_saida.npy'):
-        os.remove('data/encoded/vetor_saida.npy')
+    if os.path.isfile("data/encoded/vetor_entrada.npy"):
+        os.remove("data/encoded/vetor_entrada.npy")
+    if os.path.isfile("data/encoded/vetor_saida.npy"):
+        os.remove("data/encoded/vetor_saida.npy")
 
-    
     if DATASET == "st":
         caminho = "data/standardized/*.csv"
     elif DATASET == "fl":
         caminho = "data/filtered/*.csv"
     elif DATASET == "bl":
         caminho = "data/balanced/*.csv"
+    elif DATASET == "sp":
+        caminho = "data/separated/separated.csv"
 
     arquivos_csv = glob.glob(caminho)
-    print(len(arquivos_csv), "arquivos encontrados.\nIniciando codificação...")
+    print(len(arquivos_csv), "arquivo(s) encontrado(s).\nIniciando codificação...")
 
     # encode
     if OPTION == "oh":

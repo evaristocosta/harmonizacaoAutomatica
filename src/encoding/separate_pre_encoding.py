@@ -1,7 +1,11 @@
 import numpy as np
+import pandas as pd
+import csv
+import os
 from scipy.stats import norm
 from sklearn.model_selection import train_test_split
 import argparse
+
 
 parser = argparse.ArgumentParser(description="Data separation")
 parser.add_argument(
@@ -24,15 +28,16 @@ RATIO = args.p
 
 def tamanho_amostral():
     print("Calculando tamanho amostral ideal...")
-    print("Tamanho inicial (shape entrada): ", vetor_entrada.shape)
 
-    vetor_entrada = np.load("data/encoded/vetor_entrada.npy", mmap_mode="r")
-    vetor_saida = np.load("data/encoded/vetor_saida.npy", mmap_mode="r")
+    caminho_csv = "data/filtered/filtrado.csv"
+    number_lines = sum(1 for row in (open(caminho_csv)))
+
+    print("Tamanho inicial: ", number_lines)
 
     # calcula tamanho amostral
     # http://www.cienciasecognicao.org/portal/wp-content/uploads/2011/09/Tamanho-da-Amostra-1-1.pdf
     # TRIOLA, Mário F. Introdução à Estatística. 7a. Ed. Rio de Janeiro: LTC, 1999. pg. 163
-    N = vetor_entrada.shape[0]
+    N = number_lines
     confianca = 0.99
     alpha = 1 - confianca
     # https://www.statology.org/z-critical-value-python/
@@ -43,49 +48,41 @@ def tamanho_amostral():
     n = round((N * (Z**2) * pq) / ((N - 1) * e**2 + (Z**2) * pq))
     porcentagem = n / N
 
-    X, _, Y, _ = train_test_split(
-        vetor_entrada,
-        vetor_saida,
-        train_size=porcentagem,
-        shuffle=True,
-        random_state=42,
-        stratify=vetor_saida,
+    total_rows = int(number_lines * porcentagem)
+    df = pd.read_csv(caminho_csv, header=None, nrows=total_rows)
+    saida = "data/separated/separated.csv"
+    df.to_csv(
+        saida,
+        index=False,
+        mode="w",
+        header=not os.path.exists(saida),
     )
-
-    del vetor_entrada
-    del vetor_saida
-
-    np.save("data/separated/vetor_entrada.npy", X)
-    np.save("data/separated/vetor_saida.npy", Y)
 
     print("Tamanho original: ", N)
     print("Número de amostras: ", n)
     print("Porcentagem: ", porcentagem)
-    print("Tamanho final (shape entrada): ", X.shape)
+    print("Tamanho final: ", total_rows)
 
 
 def porcentagem_fixa():
-    vetor_entrada = np.load("data/encoded/vetor_entrada.npy", mmap_mode="r")
-    vetor_saida = np.load("data/encoded/vetor_saida.npy", mmap_mode="r")
-    print("Tamanho inicial (shape entrada): ", vetor_entrada.shape)
+    caminho_csv = "data/filtered/filtrado.csv"
 
-    X, _, Y, _ = train_test_split(
-        vetor_entrada,
-        vetor_saida,
-        train_size=RATIO,
-        shuffle=True,
-        random_state=42,
-        stratify=vetor_saida,
-    )
-
-    del vetor_entrada
-    del vetor_saida
-
-    np.save("data/separated/vetor_entrada.npy", X)
-    np.save("data/separated/vetor_saida.npy", Y)
-
+    number_lines = sum(1 for row in (open(caminho_csv)))
+    print("Tamanho inicial (num linhas): ", number_lines)
     print("Porcentagem: ", RATIO)
-    print("Tamanho final (shape entrada): ", X.shape)
+
+    total_rows = int(number_lines * RATIO)
+    print("Tamanho final: ", total_rows)
+
+    df = pd.read_csv(caminho_csv, header=None, nrows=total_rows)
+
+    saida = "data/separated/separated.csv"
+    df.to_csv(
+        saida,
+        index=False,
+        mode="w",
+        header=not os.path.exists(saida),
+    )
 
 
 def separate():
