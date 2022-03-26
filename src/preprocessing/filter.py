@@ -104,6 +104,8 @@ def filter():
         # elaboracao da tabela
         df = DataFrame(dados_coletados)
 
+        if not os.path.isdir(novo_caminho):
+            os.mkdir(novo_caminho)
         df.to_csv(
             novo_caminho + "filtrado.csv",
             encoding="utf-8",

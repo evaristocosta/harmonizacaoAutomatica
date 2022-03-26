@@ -76,9 +76,12 @@ def porcentagem_fixa():
 
     df = pd.read_csv(caminho_csv, header=None, nrows=total_rows)
 
-    saida = "data/separated/separated.csv"
+    saida = "data/separated/"
+    if not os.path.isdir(saida):
+        os.mkdir(saida)
+
     df.to_csv(
-        saida,
+        saida + "separated.csv",
         index=False,
         mode="w",
         header=not os.path.exists(saida),

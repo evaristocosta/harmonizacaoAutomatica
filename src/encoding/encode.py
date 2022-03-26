@@ -25,6 +25,8 @@ OPTION = args.e
 
 
 def encode():
+    if not os.path.isdir("data/encoded/"):
+        os.mkdir("data/encoded/")
     # remove anteriores
     if os.path.isfile("data/encoded/vetor_entrada.npy"):
         os.remove("data/encoded/vetor_entrada.npy")

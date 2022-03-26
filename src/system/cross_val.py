@@ -2,7 +2,7 @@ import numpy as np
 import gc
 import keras
 import tensorflow as tf
-from tensorflow.keras.optimizers import SGD, Adam 
+from tensorflow.keras.optimizers import SGD, Adam
 from keras.callbacks import ModelCheckpoint, CSVLogger
 
 
@@ -19,19 +19,19 @@ real_por_fold = []
 r = open("log_resultados.csv", "w")
 r.write("rodada,loss,accuracy,f1score")
 
-X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega()
+X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega(data="encoded", ratio=0.7)
 input_shape = X_train.shape[1]
 output_shape = Y_train.shape[1]
 
 params = {
     "input_shape": input_shape,
     "output_shape": output_shape,
-    "neurons": 128,
-    "activation": "relu",
+    "neurons": [64, 128, 256],
+    "activation": "tanh",
     "batch_size": 128,
-    "epochs": 10,
-    "optimizer": Adam,
-    "learning_rate": 0.01,
+    "epochs": 300,
+    "optimizer": SGD,
+    "learning_rate": 0.0001,
     "model": "mlp_1_hidden",
 }
 
@@ -54,9 +54,9 @@ for rodada in range(num_folds):
         save_best_only=True,
         mode="min",
     )
-    log = CSVLogger( str(rodada + 1) + ".csv", append=False)
+    log = CSVLogger(str(rodada + 1) + ".csv", append=False)
     lista_callbacks = [checkpoint, log]
-    
+
     modelo.fit(
         X_train,
         Y_train,
@@ -67,8 +67,10 @@ for rodada in range(num_folds):
     )
 
     # Carrega melhor modelo
-    modelo.load_weights( str(rodada + 1) + ".h5")
-    metricas = modelo.evaluate(X_test, Y_test, verbose=1, batch_size=params["batch_size"])
+    modelo.load_weights(str(rodada + 1) + ".h5")
+    metricas = modelo.evaluate(
+        X_test, Y_test, verbose=1, batch_size=params["batch_size"]
+    )
     print("\n==========\nResultados para fold " + str(rodada + 1) + ":\n")
     r.write(f"\n{rodada+1},")
 
@@ -80,7 +82,7 @@ for rodada in range(num_folds):
 
     # salva o modelo
     modelo_json = modelo.to_json()
-    caminho_modelo =  str(rodada + 1) + ".json"
+    caminho_modelo = str(rodada + 1) + ".json"
     open(caminho_modelo, "w").write(modelo_json)
 
     predicao = modelo.predict(X_test)
