@@ -2,14 +2,14 @@ import argparse
 import numpy as np
 import keras
 import tensorflow as tf
-from tensorflow.keras.optimizers import SGD, Adam 
+from tensorflow.keras.optimizers import SGD, Adam
 from keras.callbacks import ModelCheckpoint
 import talos
 
 from sklearn.metrics import accuracy_score
 
 
-from load_data import carrega
+from load_data import carrega, separa
 from models import *
 
 
@@ -33,14 +33,15 @@ OPTIMIZER = args.optimizer
 
 
 def fit():
-    X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega(data="encoded", ratio=0.7)
+    X, Y = carrega(data="encoded")
+    X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=0.7)
     input_shape = X_train.shape[1]
     output_shape = Y_train.shape[1]
 
     params = {
         "input_shape": input_shape,
         "output_shape": output_shape,
-        "neurons": 64, # 128, 256
+        "neurons": 64,  # 128, 256
         "activation": "tanh",
         "batch_size": 1,
         "epochs": 300,

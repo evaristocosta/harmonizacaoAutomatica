@@ -3,12 +3,13 @@ import gc
 import time
 import os
 import keras
+from sklearn.model_selection import StratifiedKFold
 import tensorflow as tf
 from tensorflow.keras.optimizers import SGD, Adam
 from keras.callbacks import ModelCheckpoint, CSVLogger
 import talos
 
-from load_data import carrega
+from load_data import carrega, separa
 from models import *
 
 
@@ -25,9 +26,9 @@ def cross_val():
     log = open(caminho + "log_resultados.csv", "w")
     log.write("rodada,loss,accuracy")
 
-    X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega(data="encoded", ratio=0.7)
-    input_shape = X_train.shape[1]
-    output_shape = Y_train.shape[1]
+    X, Y = carrega(data="encoded")
+    input_shape = X.shape[1]
+    output_shape = Y.shape[1]
 
     params = {
         "input_shape": input_shape,
@@ -48,9 +49,10 @@ def cross_val():
     predicao_por_fold = []
     real_por_fold = []
 
-    num_folds = 5
+    X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=0.7)
+    repetitions = 30
 
-    for rodada in range(num_folds):
+    for rodada in range(repetitions):
         if params["model"] == "mlp_1_hidden":
             modelo = mlp_1_hidden.model(params)
         elif params["model"] == "mlp_2_hidden":
@@ -63,7 +65,9 @@ def cross_val():
         modelo.compile(
             loss="categorical_crossentropy",
             optimizer=params["optimizer"](
-                lr=talos.utils.lr_normalizer(params["learning_rate"], params["optimizer"])
+                lr=talos.utils.lr_normalizer(
+                    params["learning_rate"], params["optimizer"]
+                )
             ),
             metrics=["accuracy"],
         )
@@ -75,7 +79,9 @@ def cross_val():
             save_best_only=True,
             mode="min",
         )
-        train_log = CSVLogger(caminho + "logs/" + str(rodada + 1) + ".csv", append=False)
+        train_log = CSVLogger(
+            caminho + "logs/" + str(rodada + 1) + ".csv", append=False
+        )
         lista_callbacks = [checkpoint, train_log]
 
         modelo.fit(
@@ -114,21 +120,6 @@ def cross_val():
         # https://forums.fast.ai/t/how-could-i-release-gpu-memory-of-keras/2023/7
         tf.keras.backend.clear_session()
         gc.collect()
-
-
-    log.close()
-
-    np.save(caminho + "output/predicao_por_fold.npy", predicao_por_fold)
-    np.save(caminho + "output/real_por_fold.npy", real_por_fold)
-
-    melhor_fold_loss = loss_por_fold.index(min(loss_por_fold))
-    print("Melhor fold:", melhor_fold_loss + 1)
-
-    sumario = open("src/results/summary.csv", "a")
-    sumario.write(
-        f"{agora},{teste},{melhor_fold_loss + 1},{loss_por_fold[melhor_fold_loss]},{acc_por_fold[melhor_fold_loss]}\n"
-    )
-    sumario.close()
 
 
 if __name__ == "__main__":

@@ -2,13 +2,11 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 
-def carrega(data="separated", ratio=0.6):
+def carrega(data="separated"):
     X = np.load("data/" + data + "/vetor_entrada.npy", mmap_mode="r")
     Y = np.load("data/" + data + "/vetor_saida.npy", mmap_mode="r")
 
-    X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio)
-
-    return X_train, Y_train, X_val, Y_val, X_test, Y_test
+    return X, Y
 
 
 def separa(X, Y, ratio_train=0.6):
