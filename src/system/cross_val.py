@@ -53,60 +53,77 @@ def cross_val():
     repetitions = 30
 
     for rodada in range(repetitions):
-        if params["model"] == "mlp_1_hidden":
-            modelo = mlp_1_hidden.model(params)
-        elif params["model"] == "mlp_2_hidden":
-            modelo = mlp_2_hidden.model(params)
-        elif params["model"] == "rbf":
-            modelo = rbf.model(params, X_train)
-        elif params["model"] == "cnn_like_alexnet":
-            modelo = cnn_like_alexnet.model(params)
+        if params["model"] != "elm" and params["model"] != "esn":
+            if params["model"] == "mlp_1_hidden":
+                modelo = mlp_1_hidden.model(params)
+            elif params["model"] == "mlp_2_hidden":
+                modelo = mlp_2_hidden.model(params)
+            elif params["model"] == "rbf":
+                modelo = rbf.model(params, X_train)
+            elif params["model"] == "cnn_like_alexnet":
+                modelo = cnn_like_alexnet.model(params)
 
-        modelo.compile(
-            loss="categorical_crossentropy",
-            optimizer=params["optimizer"](
-                lr=talos.utils.lr_normalizer(
-                    params["learning_rate"], params["optimizer"]
+            modelo.compile(
+                loss="categorical_crossentropy",
+                optimizer=params["optimizer"](
+                    lr=talos.utils.lr_normalizer(
+                        params["learning_rate"], params["optimizer"]
+                    )
+                ),
+                metrics=["accuracy"],
+            )
+
+            checkpoint = ModelCheckpoint(
+                caminho + "pesos/" + str(rodada + 1) + ".h5",
+                monitor="val_loss",
+                verbose=1,
+                save_best_only=True,
+                mode="min",
+            )
+            train_log = CSVLogger(
+                caminho + "logs/" + str(rodada + 1) + ".csv", append=False
+            )
+            lista_callbacks = [checkpoint, train_log]
+
+            modelo.fit(
+                X_train,
+                Y_train,
+                batch_size=params["batch_size"],
+                epochs=params["epochs"],
+                validation_data=(X_val, Y_val),
+                callbacks=lista_callbacks,
+            )
+
+            # Carrega melhor modelo
+            modelo.load_weights(caminho + "pesos/" + str(rodada + 1) + ".h5")
+            metricas = modelo.evaluate(
+                X_test, Y_test, verbose=1, batch_size=params["batch_size"]
+            )
+            print("\n==========\nResultados para fold " + str(rodada + 1) + ":\n")
+
+            log.write(f"\n{rodada+1},")
+
+            for metrica in modelo.metrics_names:
+                print(metrica + ": " + str(metricas[modelo.metrics_names.index(metrica)]))
+                log.write(str(metricas[modelo.metrics_names.index(metrica)]) + ",")
+
+            loss_por_fold.append(metricas[0])
+            acc_por_fold.append(metricas[1])
+
+        else:
+            if params["model"] == "elm":
+                modelo = elm.ELM(
+                    params["input_shape"], params["output_shape"], params["neurons"]
                 )
-            ),
-            metrics=["accuracy"],
-        )
+                modelo.train(X_train, Y_train)
 
-        checkpoint = ModelCheckpoint(
-            caminho + "pesos/" + str(rodada + 1) + ".h5",
-            monitor="val_loss",
-            verbose=1,
-            save_best_only=True,
-            mode="min",
-        )
-        train_log = CSVLogger(
-            caminho + "logs/" + str(rodada + 1) + ".csv", append=False
-        )
-        lista_callbacks = [checkpoint, train_log]
+            elif params["model"] == "esn":
+                modelo = esn.ESN(
+                    n_inputs=params["input_shape"],
+                    n_outputs=params["output_shape"],
+                )
+                modelo.fit(X_train, Y_train)
 
-        modelo.fit(
-            X_train,
-            Y_train,
-            batch_size=params["batch_size"],
-            epochs=params["epochs"],
-            validation_data=(X_val, Y_val),
-            callbacks=lista_callbacks,
-        )
-
-        # Carrega melhor modelo
-        modelo.load_weights(caminho + "pesos/" + str(rodada + 1) + ".h5")
-        metricas = modelo.evaluate(
-            X_test, Y_test, verbose=1, batch_size=params["batch_size"]
-        )
-        print("\n==========\nResultados para fold " + str(rodada + 1) + ":\n")
-        log.write(f"\n{rodada+1},")
-
-        for metrica in modelo.metrics_names:
-            print(metrica + ": " + str(metricas[modelo.metrics_names.index(metrica)]))
-            log.write(str(metricas[modelo.metrics_names.index(metrica)]) + ",")
-
-        loss_por_fold.append(metricas[0])
-        acc_por_fold.append(metricas[1])
 
         predicao = modelo.predict(X_test)
         # transforma em array
@@ -120,6 +137,20 @@ def cross_val():
         # https://forums.fast.ai/t/how-could-i-release-gpu-memory-of-keras/2023/7
         tf.keras.backend.clear_session()
         gc.collect()
+
+    log.close()
+
+    np.save(caminho + "output/predicao_por_fold.npy", predicao_por_fold)
+    np.save(caminho + "output/real_por_fold.npy", real_por_fold)
+
+    melhor_fold_loss = loss_por_fold.index(min(loss_por_fold))
+    print("Melhor fold:", melhor_fold_loss + 1)
+
+    sumario = open("src/results/summary.csv", "a")
+    sumario.write(
+        f"{agora},{teste},{melhor_fold_loss + 1},{loss_por_fold[melhor_fold_loss]},{acc_por_fold[melhor_fold_loss]}\n"
+    )
+    sumario.close()
 
 
 if __name__ == "__main__":
