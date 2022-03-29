@@ -33,19 +33,19 @@ OPTIMIZER = args.optimizer
 
 
 def fit():
-    X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega()
+    X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega(data="encoded", ratio=0.7)
     input_shape = X_train.shape[1]
     output_shape = Y_train.shape[1]
 
     params = {
         "input_shape": input_shape,
         "output_shape": output_shape,
-        "neurons": 128,
-        "activation": "relu",
-        "batch_size": 128,
-        "epochs": 10,
-        "optimizer": Adam,
-        "learning_rate": 0.01,
+        "neurons": 64, # 128, 256
+        "activation": "tanh",
+        "batch_size": 1,
+        "epochs": 300,
+        "optimizer": SGD,
+        "learning_rate": 0.001 * 100.0,
         "model": "mlp_1_hidden",
     }
 
@@ -93,8 +93,6 @@ def fit():
 
     print("Acerto:", acerto)
 
-    return predicao, Y_test, historico
-
 
 def model_fit(X_train, Y_train, X_val, Y_val, params):
     if params["model"] == "mlp_1_hidden":
@@ -105,6 +103,8 @@ def model_fit(X_train, Y_train, X_val, Y_val, params):
         modelo = rbf.model(params, X_train)
     elif params["model"] == "cnn_like_alexnet":
         modelo = cnn_like_alexnet.model(params)
+
+    modelo.summary()
 
     modelo.compile(
         loss="categorical_crossentropy",

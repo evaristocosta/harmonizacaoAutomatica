@@ -16,7 +16,7 @@ parser.add_argument(
     choices=["triad", "seventh"],
 )
 parser.add_argument(
-    "--db_percentage", type=float, default=0.3, help="Percentage of data to be used"
+    "--db_percentage", type=float, default=1.0, help="Percentage of data to be used"
 )
 parser.add_argument(
     "--semibreve", type=int, default=96, help="Number of semibreve duration/ticks"

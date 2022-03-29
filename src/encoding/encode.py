@@ -14,7 +14,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "-d",
-    help="Qual tipo de dados usar (st: standard, fl: filtered, bl: balanced)",
+    help="Qual tipo de dados usar (st: standard, fl: filtered, bl: balanced, sp: separated)",
     default="sp",
     choices=["st", "fl", "bl", "sp"],
 )
