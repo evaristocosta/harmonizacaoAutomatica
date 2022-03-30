@@ -18,6 +18,7 @@
 *.npy
 *.h5
 *.pkl
+*.json
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

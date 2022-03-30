@@ -1,7 +1,9 @@
 import gc
+import json
 import time
 import os
 import argparse
+import pickle
 import numpy as np
 import keras
 from sklearn.metrics import accuracy_score, log_loss
@@ -34,7 +36,6 @@ MODEL = args.model
 REPETITIONS = args.repetitions
 
 
-
 def cross_val():
     agora = str(int(time.time()))
     teste = MODEL
@@ -42,6 +43,7 @@ def cross_val():
     if not os.path.isdir(caminho):
         os.mkdir(caminho)
         os.mkdir(caminho + "pesos/")
+        os.mkdir(caminho + "modelos/")
         os.mkdir(caminho + "logs/")
         os.mkdir(caminho + "output/")
 
@@ -63,7 +65,7 @@ def cross_val():
         "learning_rate": 0.001 * 100.0,
         "model": MODEL,
     }
-    open(caminho + "params.txt", "w").write(str(params))
+    
 
     # controle
     loss_por_fold = []
@@ -118,6 +120,7 @@ def cross_val():
 
             # Carrega melhor modelo
             modelo.load_weights(caminho + "pesos/" + str(rodada + 1) + ".h5")
+            modelo.save(caminho + "modelos/" + str(rodada + 1) + ".h5")
 
         else:
             if params["model"] == "elm":
@@ -132,8 +135,6 @@ def cross_val():
                     n_outputs=params["output_shape"],
                 )
                 modelo.fit(X_train, Y_train)
-
-            import pickle
 
             with open(caminho + "pesos/" + str(rodada + 1) + ".pkl", "wb") as f:
                 pickle.dump(modelo, f)
@@ -163,6 +164,10 @@ def cross_val():
         gc.collect()
 
     log.close()
+
+    params["optimizer"] = str(params["optimizer"])
+    with open(caminho + "params.json", "w") as f:
+        json.dump(params, f)
 
     np.save(caminho + "output/predicao_por_fold.npy", predicao_por_fold)
     np.save(caminho + "output/real_por_fold.npy", real_por_fold)
