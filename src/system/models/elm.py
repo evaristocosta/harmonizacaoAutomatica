@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-#https://medium.datadriveninvestor.com/extreme-learning-machine-for-simple-classification-e776ad797a3c
-__author__ = 'fabiansyahcahyo'
+# https://medium.datadriveninvestor.com/extreme-learning-machine-for-simple-classification-e776ad797a3c
+__author__ = "fabiansyahcahyo"
 
 import numpy as np
 
 
 class ELM(object):
-
     def __init__(self, inputSize, outputSize, hiddenSize):
         """
         Initialize weight and bias between input layer and hidden layer
@@ -16,7 +15,7 @@ class ELM(object):
         outputSize: int
             The number of output layer dimensions
         hiddenSize: int
-            The number of hidden layer dimensions        
+            The number of hidden layer dimensions
         """
 
         self.inputSize = inputSize
@@ -25,7 +24,8 @@ class ELM(object):
 
         # Initialize random weight with range [-0.5, 0.5]
         self.weight = np.matrix(
-            np.random.uniform(-0.5, 0.5, (self.hiddenSize, self.inputSize)))
+            np.random.uniform(-0.5, 0.5, (self.hiddenSize, self.inputSize))
+        )
 
         # Initialize random bias with range [0, 1]
         self.bias = np.matrix(np.random.uniform(0, 1, (1, self.hiddenSize)))
@@ -40,7 +40,7 @@ class ELM(object):
         Parameters:
         x: array-like or matrix
             The value that the activation output will look for
-        Returns:      
+        Returns:
             The results of activation using sigmoid function
         """
         return 1 / (1 + np.exp(-1 * x))
@@ -68,7 +68,7 @@ class ELM(object):
         y: array-like or matrix
             Training data that contains the value of the target (class)
         Returns:
-            The results of the training process   
+            The results of the training process
         """
 
         X = np.matrix(X)

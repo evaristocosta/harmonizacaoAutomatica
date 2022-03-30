@@ -1,8 +1,10 @@
-import numpy as np
 import gc
 import time
 import os
+import argparse
+import numpy as np
 import keras
+from sklearn.metrics import accuracy_score, log_loss
 from sklearn.model_selection import StratifiedKFold
 import tensorflow as tf
 from tensorflow.keras.optimizers import SGD, Adam
@@ -13,10 +15,30 @@ from load_data import carrega, separa
 from models import *
 
 
+parser = argparse.ArgumentParser(description="Cross validate models")
+parser.add_argument(
+    "--model",
+    help="Which model to train",
+    default="mlp_1_hidden",
+    choices=["mlp_1_hidden", "mlp_2_hidden", "rbf", "esn", "elm", "cnn_like_alexnet"],
+)
+parser.add_argument(
+    "--repetitions",
+    help="How many cross validation repetions",
+    default=30,
+    type=int,
+)
+args = parser.parse_args()
+
+MODEL = args.model
+REPETITIONS = args.repetitions
+
+
+
 def cross_val():
     agora = str(int(time.time()))
-    teste = "mlp_1_hidden"
-    caminho = "src/results/" + teste + "_" + agora + "/"
+    teste = MODEL
+    caminho = "src/system/results/" + teste + "_" + agora + "/"
     if not os.path.isdir(caminho):
         os.mkdir(caminho)
         os.mkdir(caminho + "pesos/")
@@ -39,7 +61,7 @@ def cross_val():
         "epochs": 10,
         "optimizer": SGD,
         "learning_rate": 0.001 * 100.0,
-        "model": "mlp_1_hidden",
+        "model": MODEL,
     }
     open(caminho + "params.txt", "w").write(str(params))
 
@@ -50,7 +72,7 @@ def cross_val():
     real_por_fold = []
 
     X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=0.7)
-    repetitions = 30
+    repetitions = REPETITIONS
 
     for rodada in range(repetitions):
         if params["model"] != "elm" and params["model"] != "esn":
@@ -96,19 +118,6 @@ def cross_val():
 
             # Carrega melhor modelo
             modelo.load_weights(caminho + "pesos/" + str(rodada + 1) + ".h5")
-            metricas = modelo.evaluate(
-                X_test, Y_test, verbose=1, batch_size=params["batch_size"]
-            )
-            print("\n==========\nResultados para fold " + str(rodada + 1) + ":\n")
-
-            log.write(f"\n{rodada+1},")
-
-            for metrica in modelo.metrics_names:
-                print(metrica + ": " + str(metricas[modelo.metrics_names.index(metrica)]))
-                log.write(str(metricas[modelo.metrics_names.index(metrica)]) + ",")
-
-            loss_por_fold.append(metricas[0])
-            acc_por_fold.append(metricas[1])
 
         else:
             if params["model"] == "elm":
@@ -124,15 +133,30 @@ def cross_val():
                 )
                 modelo.fit(X_train, Y_train)
 
+            import pickle
+
+            with open(caminho + "pesos/" + str(rodada + 1) + ".pkl", "wb") as f:
+                pickle.dump(modelo, f)
 
         predicao = modelo.predict(X_test)
-        # transforma em array
         predicao = np.squeeze(np.asarray(predicao))
-        predicao = np.argmax(predicao, axis=1)
+        predicao_categorico = np.argmax(predicao, axis=1)
         Y_categorico = np.argmax(Y_test, axis=1)
 
+        loss = log_loss(Y_categorico, predicao)
+        acc = accuracy_score(Y_categorico, predicao_categorico)
+        print("loss: ", loss)
+        print("acc: ", acc)
+
+        log.write(f"\n{rodada+1},{loss},{acc}")
+
+        loss_por_fold.append(loss)
+        acc_por_fold.append(acc)
+
         predicao_por_fold.append(predicao)
-        real_por_fold.append(Y_categorico)
+        real_por_fold.append(Y_test)
+
+        del modelo
 
         # https://forums.fast.ai/t/how-could-i-release-gpu-memory-of-keras/2023/7
         tf.keras.backend.clear_session()
@@ -146,7 +170,7 @@ def cross_val():
     melhor_fold_loss = loss_por_fold.index(min(loss_por_fold))
     print("Melhor fold:", melhor_fold_loss + 1)
 
-    sumario = open("src/results/summary.csv", "a")
+    sumario = open("src/system/results/summary.csv", "a")
     sumario.write(
         f"{agora},{teste},{melhor_fold_loss + 1},{loss_por_fold[melhor_fold_loss]},{acc_por_fold[melhor_fold_loss]}\n"
     )

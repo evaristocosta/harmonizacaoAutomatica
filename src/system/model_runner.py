@@ -1,4 +1,5 @@
 import argparse
+import os
 import numpy as np
 import keras
 import tensorflow as tf
@@ -64,7 +65,7 @@ def fit():
             params["optimizer"] = SGD
         elif OPTIMIZER == "adam":
             params["optimizer"] = Adam
-        historico, modelo = model_fit(X_train, Y_train, X_val, Y_val, params)
+        _, modelo = model_fit(X_train, Y_train, X_val, Y_val, params)
 
     else:
         if MODEL == "elm":
@@ -79,8 +80,6 @@ def fit():
                 n_outputs=params["output_shape"],
             )
             modelo.fit(X_train, Y_train)
-
-        historico = ""
 
     # igual pra todos
     predicao = modelo.predict(X_test)
@@ -134,6 +133,7 @@ def model_fit(X_train, Y_train, X_val, Y_val, params):
 
     # LOAD BEST MODEL to evaluate the performance of the model
     modelo.load_weights("modelo.h5")
+    os.remove("modelo.h5")
 
     return historico, modelo
 
