@@ -7,7 +7,7 @@ from pandas import DataFrame
 
 parser = argparse.ArgumentParser(description="Filter for standalized data")
 parser.add_argument(
-    "--not-empty",
+    "-ne",
     help="Não remover compassos vazios",
     action="store_false",
 )
@@ -19,7 +19,7 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-FILTRO_COMPASSO_VAZIO = args.not_empty
+FILTRO_COMPASSO_VAZIO = args.ne
 FILTRO_CAMPO_HARMONICO = args.hf
 SEMIBREVE = 96.0
 

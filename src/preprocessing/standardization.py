@@ -21,6 +21,8 @@ parser.add_argument(
 parser.add_argument(
     "--semibreve", type=int, default=96, help="Number of semibreve duration/ticks"
 )
+parser.add_argument("--song", type=str, default=None, help="Song to be considered")
+
 args = parser.parse_args()
 
 # Tipo de acorde
@@ -29,6 +31,8 @@ ACORDE = args.chord_type
 PORCENTAGEM_BD = args.db_percentage
 # Duração da semibreve (x)
 SEMIBREVE = args.semibreve
+# Se desejar fazer para uma música específica
+MUSICA = args.song
 
 
 def conversor_tipo_acorde_triade(chord):
@@ -219,7 +223,11 @@ def standardization():
     # de acordo com padrão da base de dados
     normalizador_bd = 16 / SEMIBREVE
 
-    caminho = "data/raw/*.csv"
+    if MUSICA is None:
+        caminho = "data/raw/*.csv"
+    else:
+        caminho = "data/raw/" + MUSICA + ".csv"
+        
     novo_caminho = "data/standardized/"
 
     # Encontra todos arquivos no caminho especificado
