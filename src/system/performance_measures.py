@@ -10,15 +10,14 @@ from sklearn.metrics import (
     cohen_kappa_score,
 )
 
-parser = argparse.ArgumentParser(description="Performance measures helper")
-parser.add_argument("experiment", type=int, help="Experiment date of execution")
-
-args = parser.parse_args()
-DATE = args.experiment
 
 # calculate from experiment results
 def calc_from_result():
-    date = DATE
+    parser = argparse.ArgumentParser(description="Performance measures helper")
+    parser.add_argument("experiment", type=int, help="Experiment date of execution")
+
+    args = parser.parse_args()
+    date = args.experiment
 
     # abre sumário e seleciona dados do experimento, ordenados por erro
     df = pd.read_csv("src/system/results/summary.csv")
