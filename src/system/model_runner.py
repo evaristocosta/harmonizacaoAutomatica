@@ -7,12 +7,10 @@ from tensorflow.keras.optimizers import SGD, Adam
 from keras.callbacks import ModelCheckpoint
 import talos
 
-from sklearn.metrics import accuracy_score
-
 
 from load_data import carrega, separa
 from models import *
-
+from performance_measures import print_basic_performance
 
 parser = argparse.ArgumentParser(description="Model fit and train")
 parser.add_argument(
@@ -84,14 +82,8 @@ def fit():
     # igual pra todos
     predicao = modelo.predict(X_test)
 
-    # transforma em array
-    predicao = np.squeeze(np.asarray(predicao))
-    predicao = np.argmax(predicao, axis=1)
-    Y_test = np.argmax(Y_test, axis=1)
-
-    acerto = accuracy_score(Y_test, predicao)
-
-    print("Acerto:", acerto)
+    # print basic performance
+    print_basic_performance(Y_test, predicao)
 
 
 def model_fit(X_train, Y_train, X_val, Y_val, params):

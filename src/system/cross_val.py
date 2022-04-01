@@ -6,8 +6,6 @@ import argparse
 import pickle
 import numpy as np
 import keras
-from sklearn.metrics import accuracy_score, log_loss
-from sklearn.model_selection import StratifiedKFold
 import tensorflow as tf
 from tensorflow.keras.optimizers import SGD, Adam
 from keras.callbacks import ModelCheckpoint, CSVLogger
@@ -15,6 +13,7 @@ import talos
 
 from load_data import carrega, separa
 from models import *
+from performance_measures import print_basic_performance, calc_accuracy, calc_log_loss
 
 
 parser = argparse.ArgumentParser(description="Cross validate models")
@@ -65,7 +64,6 @@ def cross_val():
         "learning_rate": 0.001 * 100.0,
         "model": MODEL,
     }
-    
 
     # controle
     loss_por_fold = []
@@ -140,14 +138,12 @@ def cross_val():
                 pickle.dump(modelo, f)
 
         predicao = modelo.predict(X_test)
-        predicao = np.squeeze(np.asarray(predicao))
-        predicao_categorico = np.argmax(predicao, axis=1)
-        Y_categorico = np.argmax(Y_test, axis=1)
 
-        loss = log_loss(Y_categorico, predicao)
-        acc = accuracy_score(Y_categorico, predicao_categorico)
-        print("loss: ", loss)
-        print("acc: ", acc)
+        loss = calc_log_loss(Y_test, predicao)
+        acc = calc_accuracy(Y_test, predicao)
+
+        # print basic performance
+        print_basic_performance(Y_test, predicao)
 
         log.write(f"\n{rodada+1},{loss},{acc}")
 

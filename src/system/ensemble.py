@@ -1,6 +1,8 @@
 import numpy as np
+from sklearn.metrics import accuracy_score, log_loss
 from predict import return_model
 from load_data import carrega, separa
+from performance_measures import print_all_performance
 
 # selecionar modelos
 selecoes = ["mlp_1_hidden", "elm", "esn"]
@@ -37,5 +39,9 @@ for predicao in predicoes:
     ganhador = np.argmax(maiores)
     predicao_ensemble.append(predicao[ganhador])
 
-# predicao final
+
 # resultados
+predicao_ensemble = np.squeeze(np.asarray(predicao_ensemble))
+
+# print all performance
+print_all_performance(Y, predicao_ensemble)
