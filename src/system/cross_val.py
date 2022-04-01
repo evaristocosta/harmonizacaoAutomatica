@@ -56,10 +56,10 @@ def cross_val():
     params = {
         "input_shape": input_shape,
         "output_shape": output_shape,
-        "neurons": 64,  # 128, 256
-        "activation": "tanh",
-        "batch_size": 128,
-        "epochs": 10,
+        "neurons": 256,  # 64, 128, 256
+        "activation": "sigmoid",
+        "batch_size": 1,
+        "epochs": 300,
         "optimizer": SGD,
         "learning_rate": 0.001 * 100.0,
         "model": MODEL,

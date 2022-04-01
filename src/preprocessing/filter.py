@@ -9,12 +9,14 @@ parser = argparse.ArgumentParser(description="Filter for standalized data")
 parser.add_argument(
     "-ne",
     help="Não remover compassos vazios",
-    action="store_false",
+    type=bool,
+    default=True,
 )
 parser.add_argument(
     "-hf",
     help="Remover acordes fora do campo harmônico",
-    action="store_true",
+    type=bool,
+    default=False,
 )
 
 args = parser.parse_args()
