@@ -15,6 +15,17 @@ from load_data import carrega, separa
 from models import *
 from performance_measures import print_basic_performance, calc_accuracy, calc_log_loss
 
+gpus = tf.config.list_physical_devices("GPU")
+if gpus:
+    try:
+        # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        logical_gpus = tf.config.list_logical_devices("GPU")
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Memory growth must be set before GPUs have been initialized
+        print(e)
 
 parser = argparse.ArgumentParser(description="Cross validate models")
 parser.add_argument(
@@ -56,7 +67,7 @@ def cross_val():
     params = {
         "input_shape": input_shape,
         "output_shape": output_shape,
-        "neurons": 256,  # 64, 128, 256
+        "neurons": 64,  # 64, 128, 256
         "activation": "sigmoid",
         "batch_size": 1,
         "epochs": 300,
