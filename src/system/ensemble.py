@@ -4,33 +4,36 @@ from predict import return_model
 from load_data import carrega, separa
 from performance_measures import print_all_performance
 
-parser = argparse.ArgumentParser(description="Ensemble learning")
-parser.add_argument("--models", nargs="+", help="Models to be used", required=True)
-parser.add_argument(
-    "--vote",
-    type=str,
-    help="Voting method",
-    default="majority",
-    choices=["majority", "wta"],
-)
-
-args = parser.parse_args()
-MODELS = args.models
-VOTING = args.vote
-
 
 def ensemble():
-    votacao = VOTING
-    selecoes = MODELS
+    parser = argparse.ArgumentParser(description="Ensemble learning")
+    parser.add_argument("--models", nargs="+", help="Models to be used", required=True)
+    parser.add_argument(
+        "--vote",
+        type=str,
+        help="Voting method",
+        default="majority",
+        choices=["majority", "wta"],
+    )
 
+    args = parser.parse_args()
+    MODELS = args.models
+    VOTING = args.vote
+
+    X, Y = carrega(data="encoded")
+    _, _, _, _, X, Y = separa(X, Y, ratio_train=0.7)
+
+    predicao_ensemble = predict(VOTING, MODELS, X)
+
+    # print all performance
+    print_all_performance(Y, predicao_ensemble)
+
+
+def predict(votacao, selecoes, X):
     modelos = []
     # carregar modelos
     for selecao in selecoes:
         modelos.append(return_model(selecao))
-
-    # fazer predicoes com modelos
-    X, Y = carrega(data="encoded")
-    _, _, _, _, X, Y = separa(X, Y, ratio_train=0.7)
 
     predicoes = []
 
@@ -57,9 +60,7 @@ def ensemble():
 
     # resultados
     predicao_ensemble = np.squeeze(np.asarray(predicao_ensemble))
-
-    # print all performance
-    print_all_performance(Y, predicao_ensemble)
+    return predicao_ensemble
 
 
 if __name__ == "__main__":
