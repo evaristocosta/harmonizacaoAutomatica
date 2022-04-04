@@ -40,10 +40,17 @@ parser.add_argument(
     default=30,
     type=int,
 )
+parser.add_argument(
+    "--neurons",
+    help="How many neurons in the hidden layer",
+    default=64,
+    type=int,
+)
 args = parser.parse_args()
 
 MODEL = args.model
 REPETITIONS = args.repetitions
+NEURONS = args.neurons
 
 
 def cross_val():
@@ -67,7 +74,7 @@ def cross_val():
     params = {
         "input_shape": input_shape,
         "output_shape": output_shape,
-        "neurons": 64,  # 64, 128, 256
+        "neurons": NEURONS,  # 64, 128, 256
         "activation": "sigmoid",
         "batch_size": 1,
         "epochs": 300,
