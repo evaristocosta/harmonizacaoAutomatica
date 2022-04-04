@@ -1,5 +1,5 @@
-
 import tensorflow as tf
+
 # https://github.com/PetraVidnerova/rbf_keras
 from keras import backend as K
 from tensorflow.keras.layers import Layer
@@ -10,6 +10,7 @@ from keras.models import Sequential
 from keras.layers import (
     Input,
     Dense,
+    Activation,
 )
 
 
@@ -118,6 +119,7 @@ def model(params, X):
             initializer=InitCentersRandom(X),
         )
     )
-    model.add(Dense(params["output_shape"], activation="softmax"))
+    model.add(Dense(params["output_shape"]))
+    model.add(Activation("softmax"))
 
     return model
