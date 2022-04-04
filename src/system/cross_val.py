@@ -15,6 +15,7 @@ from load_data import carrega, separa
 from models import *
 from performance_measures import print_basic_performance, calc_accuracy, calc_log_loss
 
+# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 gpus = tf.config.list_physical_devices("GPU")
 if gpus:
     try:
@@ -58,11 +59,11 @@ def cross_val():
     teste = MODEL
     caminho = "src/system/results/" + teste + "_" + agora + "/"
     if not os.path.isdir(caminho):
-        os.mkdir(caminho)
-        os.mkdir(caminho + "pesos/")
-        os.mkdir(caminho + "modelos/")
-        os.mkdir(caminho + "logs/")
-        os.mkdir(caminho + "output/")
+        os.makedirs(caminho)
+        os.makedirs(caminho + "pesos/")
+        os.makedirs(caminho + "modelos/")
+        os.makedirs(caminho + "logs/")
+        os.makedirs(caminho + "output/")
 
     log = open(caminho + "log_resultados.csv", "w")
     log.write("rodada,loss,accuracy")
