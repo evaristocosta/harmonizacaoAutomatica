@@ -11,6 +11,7 @@ from tensorflow.keras.optimizers import SGD, Adam
 from tensorflow.keras.callbacks import Callback
 from keras.callbacks import ModelCheckpoint, CSVLogger
 import talos
+from npy_append_array import NpyAppendArray
 
 from load_data import carrega, separa
 from models import *
@@ -95,7 +96,7 @@ def cross_val():
         "neurons": NEURONS,  # 64, 128, 256
         "activation": "sigmoid",
         "batch_size": 1,
-        "epochs": 300,
+        "epochs": 200,
         "optimizer": SGD,
         "learning_rate": 0.001 * 100.0,
         "model": MODEL,
@@ -104,8 +105,8 @@ def cross_val():
     # controle
     loss_por_fold = []
     acc_por_fold = []
-    predicao_por_fold = []
-    real_por_fold = []
+    predicao_por_fold = NpyAppendArray(caminho + "output/predicao_por_fold.npy")
+    real_por_fold = NpyAppendArray(caminho + "output/real_por_fold.npy")
 
     X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=0.7)
     repetitions = REPETITIONS
@@ -196,8 +197,8 @@ def cross_val():
         loss_por_fold.append(loss)
         acc_por_fold.append(acc)
 
-        predicao_por_fold.append(predicao)
-        real_por_fold.append(Y_test)
+        predicao_por_fold.append(np.array(predicao))
+        real_por_fold.append(np.array(Y_test))
 
         del predicao
 
@@ -208,9 +209,6 @@ def cross_val():
     params["optimizer"] = str(params["optimizer"])
     with open(caminho + "params.json", "w") as f:
         json.dump(params, f)
-
-    np.save(caminho + "output/predicao_por_fold.npy", predicao_por_fold)
-    np.save(caminho + "output/real_por_fold.npy", real_por_fold)
 
     melhor_fold_loss = loss_por_fold.index(min(loss_por_fold))
     print("Melhor fold:", melhor_fold_loss + 1)
