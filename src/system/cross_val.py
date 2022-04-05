@@ -120,7 +120,7 @@ def cross_val():
                     )
                 ),
                 metrics=["accuracy"],
-                run_eagerly=True,  # https://stackoverflow.com/a/67138072
+                # run_eagerly=True,  # https://stackoverflow.com/a/67138072
             )
 
             checkpoint = ModelCheckpoint(
