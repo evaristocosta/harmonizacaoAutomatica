@@ -1,12 +1,39 @@
+import argparse
 import numpy as np
 from sklearn.model_selection import train_test_split
 
+parser = argparse.ArgumentParser(description="Separa dados de treinamento e salva")
+parser.add_argument(
+    "-d",
+    "--data",
+    help="Dados a serem separados",
+    default="encoded",
+    choices=["encoded", "separated"],
+)
+parser.add_argument(
+    "-r", "--ratio", help="Porcentagem de treinamento", type=float, default=0.6
+)
+args = parser.parse_args()
 
-def carrega(data="separated"):
+DATA = args.data
+RATIO = args.ratio
+
+
+def salva():
+    data = DATA
+
     X = np.load("data/" + data + "/vetor_entrada.npy", mmap_mode="r")
     Y = np.load("data/" + data + "/vetor_saida.npy", mmap_mode="r")
 
-    return X, Y
+    X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=RATIO)
+
+    np.save("data/separated/input_train.npy", X_train)
+    np.save("data/separated/output_train.npy", Y_train)
+    np.save("data/separated/input_val.npy", X_val)
+    np.save("data/separated/output_val.npy", Y_val)
+    np.save("data/separated/input_test.npy", X_test)
+    np.save("data/separated/output_test.npy", Y_test)
+    print("Arquivos salvos com sucesso!")
 
 
 def separa(X, Y, ratio_train=0.6):
@@ -46,12 +73,6 @@ def separa(X, Y, ratio_train=0.6):
 
     return X_train, Y_train, X_val, Y_val, X_test, Y_test
 
-def carrega_arquivo():
-    X_train = np.load("data/separated/input_train.npy")
-    Y_train = np.load("data/separated/output_train.npy")
-    X_val = np.load("data/separated/input_val.npy")
-    Y_val = np.load("data/separated/output_val.npy")
-    X_test = np.load("data/separated/input_test.npy")
-    Y_test = np.load("data/separated/output_test.npy")
 
-    return X_train, Y_train, X_val, Y_val, X_test, Y_test
+if __name__ == "__main__":
+    salva()

@@ -17,7 +17,7 @@ parser.add_argument(
     type=str,
     default="standardized",
     help="Data to visualize",
-    choices=["standardized", "filtered"],
+    choices=["standardized", "filtered", "separated"],
 )
 parser.add_argument(
     "--type",
