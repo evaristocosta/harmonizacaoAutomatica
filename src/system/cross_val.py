@@ -7,7 +7,6 @@ import pickle
 import numpy as np
 import keras
 import tensorflow as tf
-from tensorflow.keras import backend as k
 from tensorflow.keras.optimizers import SGD, Adam
 from tensorflow.keras.callbacks import Callback
 from keras.callbacks import ModelCheckpoint, CSVLogger
@@ -17,7 +16,7 @@ from load_data import carrega, separa
 from models import *
 from performance_measures import print_basic_performance, calc_accuracy, calc_log_loss
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 gpus = tf.config.list_physical_devices("GPU")
 if gpus:
     try:
@@ -60,7 +59,7 @@ NEURONS = args.neurons
 class ClearMemory(Callback):
     def on_epoch_end(self, epoch, logs=None):
         gc.collect()
-        k.clear_session()
+        tf.keras.backend.clear_session()
 
 
 def cross_val():
@@ -87,7 +86,7 @@ def cross_val():
         "neurons": NEURONS,  # 64, 128, 256
         "activation": "sigmoid",
         "batch_size": 1,
-        "epochs": 300,
+        "epochs": 3,
         "optimizer": SGD,
         "learning_rate": 0.001 * 100.0,
         "model": MODEL,
@@ -121,7 +120,7 @@ def cross_val():
                     )
                 ),
                 metrics=["accuracy"],
-                # run_eagerly=True,  # https://stackoverflow.com/a/67138072
+                run_eagerly=True,  # https://stackoverflow.com/a/67138072
             )
 
             checkpoint = ModelCheckpoint(
@@ -189,8 +188,8 @@ def cross_val():
         del modelo
 
         # https://forums.fast.ai/t/how-could-i-release-gpu-memory-of-keras/2023/7
-        tf.keras.backend.clear_session()
         gc.collect()
+        tf.keras.backend.clear_session()
 
     log.close()
 
