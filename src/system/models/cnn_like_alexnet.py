@@ -26,4 +26,4 @@ def model(params):
             Dense(params["output_shape"], activation="softmax"),
         ]
     )
-    return model
+    return model, model.get_weights()

@@ -122,4 +122,4 @@ def model(params, X):
     model.add(Dense(params["output_shape"]))
     model.add(Activation("softmax"))
 
-    return model
+    return model, model.get_weights()

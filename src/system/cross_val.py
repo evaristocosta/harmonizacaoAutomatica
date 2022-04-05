@@ -62,6 +62,14 @@ class ClearMemory(Callback):
         tf.keras.backend.clear_session()
 
 
+def init_weight(same_old_model, first_weights):
+    # https://stackoverflow.com/a/45785545
+    # we can uncomment the line below to reshufle the weights themselves so they are not exactly the same between folds
+    weights = [np.random.permutation(x.flat).reshape(x.shape) for x in first_weights]
+
+    same_old_model.set_weights(weights)
+
+
 def cross_val():
     agora = str(int(time.time()))
     teste = MODEL
@@ -75,6 +83,7 @@ def cross_val():
 
     log = open(caminho + "log_resultados.csv", "w")
     log.write("rodada,loss,accuracy")
+    log.close()
 
     X, Y = carrega(data="encoded")
     input_shape = X.shape[1]
@@ -86,7 +95,7 @@ def cross_val():
         "neurons": NEURONS,  # 64, 128, 256
         "activation": "sigmoid",
         "batch_size": 1,
-        "epochs": 3,
+        "epochs": 300,
         "optimizer": SGD,
         "learning_rate": 0.001 * 100.0,
         "model": MODEL,
@@ -101,27 +110,30 @@ def cross_val():
     X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=0.7)
     repetitions = REPETITIONS
 
+    if params["model"] != "elm" and params["model"] != "esn":
+        if params["model"] == "mlp_1_hidden":
+            modelo, pesos = mlp_1_hidden.model(params)
+        elif params["model"] == "mlp_2_hidden":
+            modelo, pesos = mlp_2_hidden.model(params)
+        elif params["model"] == "rbf":
+            modelo, pesos = rbf.model(params, X_train)
+        elif params["model"] == "cnn_like_alexnet":
+            modelo, pesos = cnn_like_alexnet.model(params)
+
+        modelo.compile(
+            loss="categorical_crossentropy",
+            optimizer=params["optimizer"](
+                lr=talos.utils.lr_normalizer(
+                    params["learning_rate"], params["optimizer"]
+                )
+            ),
+            metrics=["accuracy"],
+            # run_eagerly=True,  # https://stackoverflow.com/a/67138072
+        )
+
     for rodada in range(repetitions):
         if params["model"] != "elm" and params["model"] != "esn":
-            if params["model"] == "mlp_1_hidden":
-                modelo = mlp_1_hidden.model(params)
-            elif params["model"] == "mlp_2_hidden":
-                modelo = mlp_2_hidden.model(params)
-            elif params["model"] == "rbf":
-                modelo = rbf.model(params, X_train)
-            elif params["model"] == "cnn_like_alexnet":
-                modelo = cnn_like_alexnet.model(params)
-
-            modelo.compile(
-                loss="categorical_crossentropy",
-                optimizer=params["optimizer"](
-                    lr=talos.utils.lr_normalizer(
-                        params["learning_rate"], params["optimizer"]
-                    )
-                ),
-                metrics=["accuracy"],
-                # run_eagerly=True,  # https://stackoverflow.com/a/67138072
-            )
+            init_weight(modelo, pesos)
 
             checkpoint = ModelCheckpoint(
                 caminho + "pesos/" + str(rodada + 1) + ".h5",
@@ -177,7 +189,9 @@ def cross_val():
         # print basic performance
         print_basic_performance(Y_test, predicao)
 
+        log = open(caminho + "log_resultados.csv", "a")
         log.write(f"\n{rodada+1},{loss},{acc}")
+        log.close()
 
         loss_por_fold.append(loss)
         acc_por_fold.append(acc)
@@ -185,13 +199,11 @@ def cross_val():
         predicao_por_fold.append(predicao)
         real_por_fold.append(Y_test)
 
-        del modelo
+        del predicao
 
         # https://forums.fast.ai/t/how-could-i-release-gpu-memory-of-keras/2023/7
         gc.collect()
         tf.keras.backend.clear_session()
-
-    log.close()
 
     params["optimizer"] = str(params["optimizer"])
     with open(caminho + "params.json", "w") as f:
