@@ -11,7 +11,6 @@ from tensorflow.keras.optimizers import SGD, Adam
 from tensorflow.keras.callbacks import Callback
 from keras.callbacks import ModelCheckpoint, CSVLogger
 import talos
-from npy_append_array import NpyAppendArray
 
 from load_data import carrega_arquivo
 from models import *
@@ -190,8 +189,12 @@ def cross_val_single():
     log.write(f"\n{rodada},{loss},{acc}")
     log.close()
 
-    predicao_por_fold.append(np.array(predicao))
-    real_por_fold.append(np.array(Y_test))
+    if len(predicao_por_fold) == 0:
+        predicao_por_fold.append(np.array(predicao))
+        real_por_fold.append(np.array(Y_test))
+    else:
+        predicao_por_fold = np.append(predicao_por_fold, [np.array(predicao)], axis=0)
+        real_por_fold = np.append(real_por_fold, [np.array(Y_test)], axis=0)
 
     np.save(caminho + "output/predicao_por_fold.npy", predicao_por_fold)
     np.save(caminho + "output/real_por_fold.npy", real_por_fold)
