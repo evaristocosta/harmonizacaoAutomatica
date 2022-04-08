@@ -101,7 +101,7 @@ def cross_val_single():
         "learning_rate": 0.001 * 100.0,
         "model": MODEL,
         "ensemble_models": ["mlp_1_hidden", "mlp_2_hidden", "rbf", "esn", "elm"],
-        "ensemble_voting": "majoriity",
+        "ensemble_voting": "majority",
     }
 
     if os.path.isfile(caminho + "output/predicao_por_fold.npy"):

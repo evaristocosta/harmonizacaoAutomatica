@@ -10,7 +10,7 @@ class Ensemble:
         self.votacao = votacao
         self.selecoes = selecoes
 
-    def ensemble(self):
+    def run(self):
         parser = argparse.ArgumentParser(description="Ensemble learning")
         parser.add_argument(
             "--models", nargs="+", help="Models to be used", required=True
@@ -70,4 +70,4 @@ class Ensemble:
 
 
 if __name__ == "__main__":
-    Ensemble.ensemble()
+    Ensemble.run()

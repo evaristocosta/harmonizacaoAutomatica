@@ -35,7 +35,15 @@ parser.add_argument(
     "--model",
     help="Which model to train",
     default="mlp_1_hidden",
-    choices=["mlp_1_hidden", "mlp_2_hidden", "rbf", "esn", "elm", "cnn_like_alexnet"],
+    choices=[
+        "mlp_1_hidden",
+        "mlp_2_hidden",
+        "rbf",
+        "esn",
+        "elm",
+        "cnn_like_alexnet",
+        "ensemble",
+    ],
 )
 parser.add_argument(
     "--repetitions",
@@ -100,6 +108,8 @@ def cross_val():
         "optimizer": SGD,
         "learning_rate": 0.001 * 100.0,
         "model": MODEL,
+        "ensemble_models": ["mlp_1_hidden", "elm"],
+        "ensemble_voting": "majority",
     }
 
     # controle
@@ -111,7 +121,7 @@ def cross_val():
     X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=0.7)
     repetitions = REPETITIONS
 
-    if params["model"] != "elm" and params["model"] != "esn":
+    if params["model"] not in ["elm", "esn", "ensemble"]:
         if params["model"] == "mlp_1_hidden":
             modelo, pesos = mlp_1_hidden.model(params)
         elif params["model"] == "mlp_2_hidden":
@@ -133,7 +143,7 @@ def cross_val():
         )
 
     for rodada in range(repetitions):
-        if params["model"] != "elm" and params["model"] != "esn":
+        if params["model"] not in ["elm", "esn", "ensemble"]:
             init_weight(modelo, pesos)
 
             checkpoint = ModelCheckpoint(
@@ -179,6 +189,11 @@ def cross_val():
                 )
                 modelo.fit(X_train, Y_train)
 
+            elif params["model"] == "ensemble":
+                modelo = ensemble.Ensemble(
+                    params["ensemble_voting"], params["ensemble_models"]
+                )
+
             with open(caminho + "pesos/" + str(rodada + 1) + ".pkl", "wb") as f:
                 pickle.dump(modelo, f)
 
@@ -209,7 +224,7 @@ def cross_val():
     params["optimizer"] = str(params["optimizer"])
     with open(caminho + "params.json", "w") as f:
         json.dump(params, f)
-    
+
     np.save(caminho + "output/predicao_por_fold.npy", predicao_por_fold)
     np.save(caminho + "output/real_por_fold.npy", real_por_fold)
 
