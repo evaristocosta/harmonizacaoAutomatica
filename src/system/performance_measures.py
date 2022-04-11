@@ -12,12 +12,12 @@ from sklearn.metrics import (
 
 
 # calculate from experiment results
-def calc_from_result():
+def calc_from_date():
     parser = argparse.ArgumentParser(description="Performance measures helper")
-    parser.add_argument("experiment", type=int, help="Experiment date of execution")
+    parser.add_argument("date", type=int, help="Experiment date of execution")
 
     args = parser.parse_args()
-    date = args.experiment
+    date = args.date
 
     # abre sumário e seleciona dados do experimento, ordenados por erro
     df = pd.read_csv("src/system/results/summary.csv")
@@ -26,7 +26,7 @@ def calc_from_result():
     # pega informações da melhor execução do experimento
     best_run = int(df["best_run"].values[0]) - 1
     experiment = str(df["experiment"].values[0])
-    print("Experiment: ", experiment)
+    print("Experiment:", experiment)
 
     path = "src/system/results/" + experiment + "_" + str(date) + "/output/"
 
@@ -120,4 +120,4 @@ def print_all_performance(y_true, y_pred):
 
 
 if __name__ == "__main__":
-    calc_from_result()
+    calc_from_date()

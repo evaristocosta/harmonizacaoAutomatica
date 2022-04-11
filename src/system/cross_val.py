@@ -108,8 +108,8 @@ def cross_val():
         "optimizer": SGD,
         "learning_rate": 0.001 * 100.0,
         "model": MODEL,
-        "ensemble_models": ["mlp_1_hidden", "mlp_2_hidden", "rbf", "esn", "elm"],
-        "ensemble_voting": "majority",
+        "ensemble_models": ["mlp_1_hidden", "mlp_2_hidden"],
+        "ensemble_voting": "wta",
     }
 
     # controle
