@@ -8,13 +8,13 @@ from pandas import DataFrame
 parser = argparse.ArgumentParser(description="Filter for standalized data")
 parser.add_argument(
     "-ne",
-    help="Não remover compassos vazios",
+    help="Remover compassos vazios (defalt: True)",
     type=bool,
     default=True,
 )
 parser.add_argument(
     "-hf",
-    help="Remover acordes fora do campo harmônico",
+    help="Remover acordes fora do campo harmônico (defalt: False)",
     type=bool,
     default=False,
 )

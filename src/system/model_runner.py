@@ -43,7 +43,7 @@ def fit():
         "neurons": 64,  # 128, 256
         "activation": "tanh",
         "batch_size": 1,
-        "epochs": 300,
+        "epochs": 3,
         "optimizer": SGD,
         "learning_rate": 0.001 * 100.0,
         "model": "mlp_1_hidden",
@@ -88,13 +88,13 @@ def fit():
 
 def model_fit(X_train, Y_train, X_val, Y_val, params):
     if params["model"] == "mlp_1_hidden":
-        modelo = mlp_1_hidden.model(params)
+        modelo, _ = mlp_1_hidden.model(params)
     elif params["model"] == "mlp_2_hidden":
-        modelo = mlp_2_hidden.model(params)
+        modelo, _ = mlp_2_hidden.model(params)
     elif params["model"] == "rbf":
-        modelo = rbf.model(params, X_train)
+        modelo, _ = rbf.model(params, X_train)
     elif params["model"] == "cnn_like_alexnet":
-        modelo = cnn_like_alexnet.model(params)
+        modelo, _ = cnn_like_alexnet.model(params)
 
     modelo.summary()
 

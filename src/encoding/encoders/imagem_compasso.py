@@ -24,7 +24,7 @@ def codificacao_nota(nota, oitava, resto, indice):
         vetor[nota_indice] = 1
 
     # razão considerando 10 oitavas (int(255/10)) ou 1/10
-    razao = 1/10
+    razao = 1 / 10
 
     alfa = 1
     cod_nota = []
@@ -39,9 +39,7 @@ def codificacao_nota(nota, oitava, resto, indice):
         else:
             cod_nota.append([0, 0, razao * float(oitava), alfa])
             cod_nota_primeira.append([0, 0, razao * float(oitava), alfa])
-            cod_nota_final.append(
-                [1, 0, 0, alfa * resto if resto != 0 else alfa]
-            )
+            cod_nota_final.append([1, 0, 0, alfa * resto if resto != 0 else alfa])
 
     # se for apogiatura, marca como verde
     if indice is not None:
