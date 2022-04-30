@@ -17,12 +17,12 @@ def model(params):
                 input_shape=params["input_shape"],
             ),
             MaxPooling2D(pool_size=(2, 2), strides=2),
-            Conv2D(64, kernel_size=(3, 3), activation="relu"),
+            Conv2D(64, kernel_size=(3, 3), activation=params["activation"]),
             MaxPooling2D(pool_size=(2, 2), strides=2),
-            Conv2D(128, kernel_size=(3, 3), activation="relu"),
+            Conv2D(128, kernel_size=(3, 3), activation=params["activation"]),
             MaxPooling2D(pool_size=(2, 2), strides=2),
             Flatten(),
-            Dense(64, activation="relu"),
+            Dense(64, activation=params["activation"]),
             Dense(params["output_shape"], activation="softmax"),
         ]
     )

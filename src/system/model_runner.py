@@ -8,18 +8,20 @@ from keras.callbacks import ModelCheckpoint
 import talos
 
 
-from load_data import carrega, separa
+from load_data import carrega, separa, carrega_arquivo
 from models import *
 from performance_measures import print_basic_performance
 
 parser = argparse.ArgumentParser(description="Model fit and train")
 parser.add_argument(
+    "-m",
     "--model",
     help="Which model to train",
     default="mlp_1_hidden",
     choices=["mlp_1_hidden", "mlp_2_hidden", "rbf", "esn", "elm", "cnn_like_alexnet"],
 )
 parser.add_argument(
+    "-o",
     "--optimizer",
     help="What optimizer to use",
     default="sgd",
@@ -32,20 +34,37 @@ OPTIMIZER = args.optimizer
 
 
 def fit():
-    X, Y = carrega(data="encoded")
-    X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=0.7)
-    input_shape = X_train.shape[1]
+    gpus = tf.config.list_physical_devices("GPU")
+    if gpus:
+        try:
+            # Currently, memory growth needs to be the same across GPUs
+            for gpu in gpus:
+                tf.config.experimental.set_memory_growth(gpu, True)
+            logical_gpus = tf.config.list_logical_devices("GPU")
+            print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+        except RuntimeError as e:
+            # Memory growth must be set before GPUs have been initialized
+            print(e)
+
+    # X, Y = carrega(data="encoded")
+    # X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=0.7)
+    X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
+    if MODEL != "cnn_like_alexnet":
+        input_shape = X_train.shape[1]
+    else:
+        input_shape = X_train.shape[1:]
+
     output_shape = Y_train.shape[1]
 
     params = {
         "input_shape": input_shape,
         "output_shape": output_shape,
         "neurons": 64,  # 128, 256
-        "activation": "tanh",
-        "batch_size": 1,
+        "activation": "elu",
+        "batch_size": 128,
         "epochs": 3,
-        "optimizer": SGD,
-        "learning_rate": 0.001 * 100.0,
+        "optimizer": Adam,
+        "learning_rate": 0.001 * 1.0,
         "model": "mlp_1_hidden",
     }
 
