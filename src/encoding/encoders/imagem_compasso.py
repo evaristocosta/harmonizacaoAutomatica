@@ -4,6 +4,7 @@ from npy_append_array import NpyAppendArray
 from math import modf
 from .dictionary import dicio_notas, dicio_acordes
 from .one_hot_function import codificacao_one_hot
+from .rgba2rgb import rgba2rgb
 
 PRECISAO = 0.000001
 
@@ -76,10 +77,12 @@ def cria_sequencia_notas(primeira_nota, nota, ultima_nota, quantidade):
 
     sequencia.append(np.array(ultima_nota))
 
+    sequencia = np.array(sequencia)
+
     return sequencia
 
 
-def processamento_ic(arquivos_csv):
+def processamento_ic(arquivos_csv, rgb=False):
     dicio_acordes_tamanho = len(dicio_acordes)
 
     # declaracao das matrizes
@@ -106,7 +109,8 @@ def processamento_ic(arquivos_csv):
         compasso_anterior = None
         indice = None
 
-        for linha in leitor:
+        for j, linha in enumerate(leitor):
+            print("Processando linha:", j + 1)
             # processamento reduziu o banco de dados a 5 colunas de infomacao:
             #    0       1      2      3        4
             # measure, chord, note, octave, duration
@@ -155,8 +159,12 @@ def processamento_ic(arquivos_csv):
             else:
                 if sequencia_notas_nao_valida(sequencia_notas):
                     sequencia_notas = []
+                else:
+                    sequencia_notas = np.array(sequencia_notas)
+                    if rgb:
+                        sequencia_notas = rgba2rgb(sequencia_notas)
 
-                if sequencia_notas:
+                if len(sequencia_notas) > 0:
                     matriz_dados_entrada.append(sequencia_notas)
                     matriz_dados_saida.append(cod_vetor_acorde)
 
@@ -181,8 +189,12 @@ def processamento_ic(arquivos_csv):
 
         if sequencia_notas_nao_valida(sequencia_notas):
             sequencia_notas = []
+        else:
+            sequencia_notas = np.array(sequencia_notas)
+            if rgb:
+                sequencia_notas = rgba2rgb(sequencia_notas)
 
-        if sequencia_notas:
+        if len(sequencia_notas) > 0:
             matriz_dados_entrada.append(sequencia_notas)
             matriz_dados_saida.append(cod_vetor_acorde)
 

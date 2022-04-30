@@ -8,21 +8,30 @@ from encoders.imagem_compasso import processamento_ic
 parser = argparse.ArgumentParser(description="Data encoder")
 parser.add_argument(
     "-e",
+    "--encoder",
     help="Qual codificação usar (oh: one hot, ic: imagem de compasso)",
     default="oh",
     choices=["oh", "ic"],
 )
 parser.add_argument(
     "-d",
+    "--dataset",
     help="Qual tipo de dados usar (st: standard, fl: filtered, bl: balanced, sp: separated)",
     default="sp",
     choices=["st", "fl", "bl", "sp"],
 )
+parser.add_argument(
+    "-c",
+    "--color",
+    help="Usar formato RGBA ou RGB",
+    default="rgba",
+    choices=["rgba", "rgb"],
+)
 args = parser.parse_args()
 
-DATASET = args.d
-OPTION = args.e
-
+DATASET = args.dataset
+OPTION = args.encoder
+COLOR= args.color
 
 def encode():
     if not os.path.isdir("data/encoded/"):
@@ -49,7 +58,7 @@ def encode():
     if OPTION == "oh":
         processamento_one_hot(arquivos_csv)
     elif OPTION == "ic":
-        processamento_ic(arquivos_csv)
+        processamento_ic(arquivos_csv, False if COLOR == "rgba" else True)
 
     s = np.load("data/encoded/vetor_saida.npy", mmap_mode="r")
     e = np.load("data/encoded/vetor_entrada.npy", mmap_mode="r")
