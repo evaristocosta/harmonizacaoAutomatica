@@ -10,7 +10,7 @@ import talos
 
 from load_data import carrega, separa, carrega_arquivo
 from models import *
-from performance_measures import print_basic_performance
+from analysis.performance_measures import print_basic_performance
 
 parser = argparse.ArgumentParser(description="Model fit and train")
 parser.add_argument(

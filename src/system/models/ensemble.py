@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 from predict import return_model
 from load_data import carrega, separa
-from performance_measures import print_all_performance
+from analysis.performance_measures import print_all_performance
 
 
 class Ensemble:

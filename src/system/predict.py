@@ -9,7 +9,7 @@ from keras.models import load_model
 
 from load_data import carrega, separa, carrega_arquivo
 from models.rbf import RBFLayer
-from performance_measures import print_basic_performance
+from analysis.performance_measures import print_basic_performance
 
 
 def main():

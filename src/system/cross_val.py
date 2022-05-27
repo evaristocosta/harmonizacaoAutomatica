@@ -15,7 +15,7 @@ from npy_append_array import NpyAppendArray
 
 from load_data import carrega, separa
 from models import *
-from performance_measures import print_basic_performance, calc_accuracy, calc_log_loss
+from analysis.performance_measures import print_basic_performance, calc_accuracy, calc_log_loss
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 gpus = tf.config.list_physical_devices("GPU")
