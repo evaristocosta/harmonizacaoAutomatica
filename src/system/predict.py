@@ -1,3 +1,7 @@
+import sys
+
+sys.path.insert(1, "/home/lucas/repos/harmonizacao/src/")
+
 import argparse
 import pickle
 import json
@@ -17,37 +21,47 @@ def main():
         description="Make predictions using a trained model."
     )
     parser.add_argument(
-        "--experiment",
+        "--date",
         type=str,
-        help="Experiment to be considered",
-    )
-    parser.add_argument("--separate", type=bool, default=True, help="Separate data?")
-    parser.add_argument(
-        "--print_chords", type=bool, default=False, help="Print chords?"
-    )
-    parser.add_argument(
-        "--recall", type=bool, default=False, help="Recalculate outputs?"
+        help="Experiment date to be considered",
     )
 
+    parser.add_argument(
+        "--separate", dest="separate", action="store_true", help="Separate data?"
+    )
+    parser.add_argument("--no-separate", dest="separate", action="store_false")
+    parser.set_defaults(separate=True)
+
+    parser.add_argument(
+        "--print_chords", dest="print_chords", action="store_true", help="Print chords?"
+    )
+    parser.add_argument("--no-print_chords", dest="print_chords", action="store_false")
+    parser.set_defaults(print_chords=False)
+    parser.add_argument(
+        "--recall", dest="recall", action="store_true", help="Recalculate outputs?"
+    )
+    parser.add_argument("--no-recall", dest="recall", action="store_false")
+    parser.set_defaults(recall=False)
+
     args = parser.parse_args()
-    EXPERIMENT = args.experiment
+    DATE = args.date
     SEPARATE = args.separate
     PRINT_CHORDS = args.print_chords
     RECALL = args.recall
 
     if RECALL:
-        recall(EXPERIMENT)
+        recall(DATE)
     else:
-        predict(EXPERIMENT, SEPARATE, PRINT_CHORDS)
+        predict(DATE, SEPARATE, PRINT_CHORDS)
 
 
-def predict(EXPERIMENT, SEPARATE, PRINT_CHORDS):
+def predict(DATE, SEPARATE, PRINT_CHORDS):
     # carrega dados
     X, Y = carrega(data="encoded")
     if SEPARATE:
         _, _, _, _, X, Y = separa(X, Y, ratio_train=0.7)
 
-    modelo = return_model(EXPERIMENT)
+    modelo = return_model(DATE)
 
     predicao = modelo.predict(X)
     print_basic_performance(Y, predicao)
@@ -57,14 +71,15 @@ def predict(EXPERIMENT, SEPARATE, PRINT_CHORDS):
         print(acordes_df.to_string())
 
 
-def return_model(experiment):
-    # abre sumário e seleciona dados do experimento, ordenados por erro
+def return_model(date):
+    # abre sumário e seleciona dados do experimento
     df = pd.read_csv("src/system/results/summary.csv")
-    df = df[df["experiment"] == experiment].sort_values(by=["loss"])
+    df = df[df["date"] == int(date)]
 
     # pega informações da melhor execução do experimento
-    date = str(df["date"].values[0])
+    experiment = str(df["experiment"].values[0])
     best_run = str(df["best_run"].values[0])
+
 
     path = "src/system/results/" + experiment + "_" + date + "/"
 
@@ -97,9 +112,9 @@ def return_model(experiment):
     return modelo
 
 
-def recall(EXPERIMENT):
+def recall(DATE):
     # abre sumário e seleciona dados do experimento, ordenados por erro
-    date = EXPERIMENT
+    date = DATE
     df = pd.read_csv("src/system/results/summary.csv")
     df = df[df["date"] == int(date)]
 
