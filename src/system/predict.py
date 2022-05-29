@@ -61,7 +61,7 @@ def predict(DATE, SEPARATE, PRINT_CHORDS):
     if SEPARATE:
         _, _, _, _, X, Y = separa(X, Y, ratio_train=0.7)
 
-    modelo = return_model(DATE)
+    modelo = return_model_by_date(DATE)
 
     predicao = modelo.predict(X)
     print_basic_performance(Y, predicao)
@@ -71,25 +71,14 @@ def predict(DATE, SEPARATE, PRINT_CHORDS):
         print(acordes_df.to_string())
 
 
-def return_model(date):
-    # abre sumário e seleciona dados do experimento
-    df = pd.read_csv("src/system/results/summary.csv")
-    df = df[df["date"] == int(date)]
-
-    # pega informações da melhor execução do experimento
-    experiment = str(df["experiment"].values[0])
-    best_run = str(df["best_run"].values[0])
-
-
-    path = "src/system/results/" + experiment + "_" + date + "/"
-
-    """ 
+def return_model(experiment, best_run, path):
+    """
     Se precisar dos parametros:
     with open(path + "params.json") as json_file:
         params = json.load(json_file)
     """
 
-    if experiment != "elm" and experiment != "esn":
+    if experiment not in ["elm", "esn", "ensemble"]:
         if experiment != "rbf":
             modelo = load_model(path + "modelos/" + best_run + ".h5")
         else:
@@ -110,6 +99,34 @@ def return_model(date):
         file.close()
 
     return modelo
+
+
+def return_model_by_date(date):
+    # abre sumário e seleciona dados do experimento
+    df = pd.read_csv("src/system/results/summary.csv")
+    df = df[df["date"] == int(date)]
+
+    # pega informações da melhor execução do experimento
+    experiment = str(df["experiment"].values[0])
+    best_run = str(df["best_run"].values[0])
+
+    path = "src/system/results/" + experiment + "_" + date + "/"
+
+    return return_model(experiment, best_run, path)
+
+
+def return_model_by_name(experiment):
+    # abre sumário e seleciona dados do experimento, ordenados por erro
+    df = pd.read_csv("src/system/results/summary.csv")
+    df = df[df["experiment"] == experiment].sort_values(by=["loss"])
+
+    # pega informações da melhor execução do experimento
+    date = str(df["date"].values[0])
+    best_run = str(df["best_run"].values[0])
+
+    path = "src/system/results/" + experiment + "_" + date + "/"
+
+    return return_model(experiment, best_run, path)
 
 
 def recall(DATE):

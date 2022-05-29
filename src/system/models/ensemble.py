@@ -1,6 +1,6 @@
 import argparse
 import numpy as np
-from predict import return_model
+from predict import return_model_by_name
 from load_data import carrega, separa
 from analysis.performance_measures import print_all_performance
 
@@ -39,7 +39,7 @@ class Ensemble:
         modelos = []
         # carregar modelos
         for selecao in self.selecoes:
-            modelos.append(return_model(selecao))
+            modelos.append(return_model_by_name(selecao))
 
         predicoes = []
 
