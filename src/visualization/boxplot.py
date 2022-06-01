@@ -24,11 +24,7 @@ tests = [
 ]
 
 plt.boxplot(losses, patch_artist=True, showfliers=True)
-# plt.title('MSE por rodada')
 plt.ylabel("Loss", fontsize=14)
-# plt.xlabel('Rodada')
 plt.xticks(np.arange(1, len(tests) +1 ), tests)
 
 plt.show()
-# plt.savefig('resultados_q2/boxplot_mlp_neuronios%s_base%s.svg' % (neuronios, base))
-# plt.close()
