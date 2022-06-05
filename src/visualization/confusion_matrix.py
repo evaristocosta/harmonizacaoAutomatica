@@ -60,7 +60,7 @@ def plot_confusion_matrix(
     normalize=True,
     anotacoes=False,
     # pylint: disable=no-member
-    cmap=plt.cm.ocean_r,
+    cmap=plt.cm.bone_r,
 ):
     """
     melhores:
@@ -79,6 +79,7 @@ def plot_confusion_matrix(
     experiment = str(df["experiment"].values[0])
     best_run = df["best_run"].values[0] - 1
 
+    print("Experiment:", experiment)
     path = "src/system/results/" + experiment + "_" + str(date) + "/"
 
     y_true = np.load(path + "output/real_por_fold.npy")

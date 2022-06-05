@@ -13,14 +13,14 @@ matplotlib.rc("ytick", labelsize=14)
 
 losses = load_losses()
 tests = [
-    "mlp_1_hidden",
-    "mlp_2_hidden",
-    "rbf",
-    "elm",
-    "esn",
-    "ensemble_all",
-    "ensemble_mlps_rbf",
-    "ensemble_mlps",
+    "MLP1",
+    "MLP2",
+    "RBF",
+    "ELM",
+    "ESN",
+    "ENS5",
+    "ENS3",
+    "ENS2",
 ]
 
 plt.boxplot(losses, patch_artist=True, showfliers=True)
