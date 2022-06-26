@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from scipy.stats import norm
 from sklearn.model_selection import train_test_split
@@ -27,12 +28,13 @@ def tamanho_amostral():
 
     vetor_entrada = np.load("data/encoded/vetor_entrada.npy", mmap_mode="r")
     vetor_saida = np.load("data/encoded/vetor_saida.npy", mmap_mode="r")
-    
+
     print("Tamanho inicial (shape entrada): ", vetor_entrada.shape)
 
     # calcula tamanho amostral
     # http://www.cienciasecognicao.org/portal/wp-content/uploads/2011/09/Tamanho-da-Amostra-1-1.pdf
     # TRIOLA, Mário F. Introdução à Estatística. 7a. Ed. Rio de Janeiro: LTC, 1999. pg. 163
+    # https://www.statisticshowto.com/probability-and-statistics/find-sample-size/
     N = vetor_entrada.shape[0]
     confianca = 0.99
     alpha = 1 - confianca
@@ -41,7 +43,7 @@ def tamanho_amostral():
     pq = 0.25
     e = 0.01
 
-    n = round((N * (Z**2) * pq) / ((N - 1) * e**2 + (Z**2) * pq))
+    n = round((N * (Z ** 2) * pq) / ((N - 1) * e ** 2 + (Z ** 2) * pq))
     porcentagem = n / N
 
     X, _, Y, _ = train_test_split(
@@ -55,6 +57,9 @@ def tamanho_amostral():
 
     del vetor_entrada
     del vetor_saida
+
+    if not os.path.isdir("data/separated"):
+        os.mkdir("data/separated")
 
     np.save("data/separated/vetor_entrada.npy", X)
     np.save("data/separated/vetor_saida.npy", Y)
@@ -81,6 +86,9 @@ def porcentagem_fixa():
 
     del vetor_entrada
     del vetor_saida
+
+    if not os.path.isdir("data/separated"):
+        os.mkdir("data/separated")
 
     np.save("data/separated/vetor_entrada.npy", X)
     np.save("data/separated/vetor_saida.npy", Y)

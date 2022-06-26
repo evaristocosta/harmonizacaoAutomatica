@@ -54,6 +54,9 @@ def codificacao_nota(nota, oitava, resto, indice):
 
 
 def sequencia_notas_nao_valida(sequencia_notas):
+    if len(sequencia_notas) == 0:
+        return False
+
     # verifica se é todo de pausas
     # https://stackoverflow.com/questions/37777529/comparing-multiple-numpy-arrays
     verificador = np.stack(sequencia_notas, axis=0)
@@ -161,7 +164,7 @@ def processamento_ic(arquivos_csv, rgb=False):
                     sequencia_notas = []
                 else:
                     sequencia_notas = np.array(sequencia_notas)
-                    if rgb:
+                    if rgb and len(sequencia_notas.shape) == 3:
                         sequencia_notas = rgba2rgb(sequencia_notas)
 
                 if len(sequencia_notas) > 0:
@@ -191,7 +194,7 @@ def processamento_ic(arquivos_csv, rgb=False):
             sequencia_notas = []
         else:
             sequencia_notas = np.array(sequencia_notas)
-            if rgb:
+            if rgb and len(sequencia_notas.shape) == 3:
                 sequencia_notas = rgba2rgb(sequencia_notas)
 
         if len(sequencia_notas) > 0:

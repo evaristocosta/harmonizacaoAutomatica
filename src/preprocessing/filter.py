@@ -7,22 +7,32 @@ from pandas import DataFrame
 
 parser = argparse.ArgumentParser(description="Filter for standalized data")
 parser.add_argument(
-    "-ne",
-    help="Remover compassos vazios (defalt: True)",
-    type=bool,
-    default=True,
+    "--empty", action="store_true", help="Remover compassos vazios (defalt: True)"
 )
+parser.add_argument("--no-empty", dest="empty", action="store_false")
+parser.set_defaults(empty=True)
+
 parser.add_argument(
-    "-hf",
+    "--harmonic",
+    action="store_true",
     help="Remover acordes fora do campo harmônico (defalt: False)",
-    type=bool,
-    default=False,
 )
+parser.add_argument("--no-harmonic", dest="harmonic", action="store_false")
+parser.set_defaults(harmonic=False)
+
+parser.add_argument(
+    "--single",
+    action="store_true",
+    help="Salvar tudo em um único arquivo (defalt: True)",
+)
+parser.add_argument("--no-single", dest="single", action="store_false")
+parser.set_defaults(single=True)
 
 args = parser.parse_args()
 
-FILTRO_COMPASSO_VAZIO = args.ne
-FILTRO_CAMPO_HARMONICO = args.hf
+FILTRO_COMPASSO_VAZIO = args.empty
+FILTRO_CAMPO_HARMONICO = args.harmonic
+ARQUIVO_UNICO = args.single
 SEMIBREVE = 96.0
 
 
@@ -44,6 +54,9 @@ def filter():
     arquivos_csv = glob.glob(caminho)
     print("Filtrando " + str(len(arquivos_csv)) + " arquivos...")
 
+    if not os.path.isdir(novo_caminho):
+        os.mkdir(novo_caminho)
+
     # Remoção de anteriores
     arquivos_antigos = glob.glob(novo_caminho + "*")
     for arquivo in arquivos_antigos:
@@ -51,7 +64,6 @@ def filter():
 
     # iteracao no vetor de arquivos mantendo o indice
     for i, caminho_csv in enumerate(arquivos_csv):
-
         # pega somente nome do arquivo
         # o indice eh usado indiretamente aqui
         nome_arquivo = ntpath.basename(caminho_csv)
@@ -106,15 +118,16 @@ def filter():
         # elaboracao da tabela
         df = DataFrame(dados_coletados)
 
-        if not os.path.isdir(novo_caminho):
-            os.mkdir(novo_caminho)
-        df.to_csv(
-            novo_caminho + "filtrado.csv",
-            encoding="utf-8",
-            index=False,
-            mode="a",
-            header=(i == 0),
-        )
+        if ARQUIVO_UNICO:
+            df.to_csv(
+                novo_caminho + "filtrado.csv",
+                encoding="utf-8",
+                index=False,
+                mode="a",
+                header=(i == 0),
+            )
+        else:
+            df.to_csv(novo_caminho + nome_arquivo, encoding="utf-8", index=False)
 
 
 if __name__ == "__main__":
