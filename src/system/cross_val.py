@@ -9,15 +9,20 @@ import keras
 import tensorflow as tf
 from tensorflow.keras.optimizers import SGD, Adam
 from tensorflow.keras.callbacks import Callback
+from tensorflow.keras.applications import vgg16
 from keras.callbacks import ModelCheckpoint, CSVLogger
 import talos
 from npy_append_array import NpyAppendArray
 
-from load_data import carrega, separa
+from load_data import carrega, separa, carrega_arquivo
 from models import *
-from analysis.performance_measures import print_basic_performance, calc_accuracy, calc_log_loss
+from analysis.performance_measures import (
+    print_basic_performance,
+    calc_accuracy,
+    calc_log_loss,
+)
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 gpus = tf.config.list_physical_devices("GPU")
 if gpus:
     try:
@@ -43,6 +48,7 @@ parser.add_argument(
         "elm",
         "cnn_like_alexnet",
         "ensemble",
+        "vgg16",
     ],
 )
 parser.add_argument(
@@ -94,18 +100,21 @@ def cross_val():
     log.write("rodada,loss,accuracy")
     log.close()
 
-    X, Y = carrega(data="encoded")
-    input_shape = X.shape[1]
-    output_shape = Y.shape[1]
+    # X, Y = carrega(data="encoded")
+    # X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=0.7)
+    X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
+
+    input_shape = X_train.shape[1:]
+    output_shape = Y_train.shape[1]
 
     params = {
         "input_shape": input_shape,
         "output_shape": output_shape,
         "neurons": NEURONS,  # 64, 128, 256
         "activation": "sigmoid",
-        "batch_size": 1,
+        "batch_size": 128,
         "epochs": 2,
-        "optimizer": SGD,
+        "optimizer": Adam,
         "learning_rate": 0.001 * 100.0,
         "model": MODEL,
         "ensemble_models": ["mlp_1_hidden", "mlp_2_hidden"],
@@ -118,7 +127,6 @@ def cross_val():
     predicao_por_fold = []
     real_por_fold = []
 
-    X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=0.7)
     repetitions = REPETITIONS
 
     if params["model"] not in ["elm", "esn", "ensemble"]:
@@ -130,6 +138,15 @@ def cross_val():
             modelo, pesos = rbf.model(params, X_train)
         elif params["model"] == "cnn_like_alexnet":
             modelo, pesos = cnn_like_alexnet.model(params)
+        elif params["model"] == "vgg16":
+            X_train *= 255
+            X_train = vgg16.preprocess_input(X_train)
+            X_val *= 255
+            X_val = vgg16.preprocess_input(X_val)
+            X_test *= 255
+            X_test = vgg16.preprocess_input(X_test)
+
+            modelo, pesos = vgg.model(params)
 
         modelo.compile(
             loss="categorical_crossentropy",
