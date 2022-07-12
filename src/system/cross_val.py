@@ -9,7 +9,6 @@ import keras
 import tensorflow as tf
 from tensorflow.keras.optimizers import SGD, Adam
 from tensorflow.keras.callbacks import Callback
-from tensorflow.keras.applications import vgg16
 from keras.callbacks import ModelCheckpoint, CSVLogger
 import talos
 from npy_append_array import NpyAppendArray
@@ -22,7 +21,7 @@ from analysis.performance_measures import (
     calc_log_loss,
 )
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 gpus = tf.config.list_physical_devices("GPU")
 if gpus:
     try:
@@ -49,6 +48,9 @@ parser.add_argument(
         "cnn_like_alexnet",
         "ensemble",
         "vgg16",
+        "resnet101",
+        "inceptionv3",
+        "densenet201",
     ],
 )
 parser.add_argument(
@@ -112,13 +114,14 @@ def cross_val():
         "output_shape": output_shape,
         "neurons": NEURONS,  # 64, 128, 256
         "activation": "sigmoid",
-        "batch_size": 128,
+        "batch_size": 512,
         "epochs": 2,
         "optimizer": Adam,
         "learning_rate": 0.001 * 100.0,
         "model": MODEL,
         "ensemble_models": ["mlp_1_hidden", "mlp_2_hidden"],
         "ensemble_voting": "wta",
+        "application": MODEL,
     }
 
     # controle
@@ -138,15 +141,11 @@ def cross_val():
             modelo, pesos = rbf.model(params, X_train)
         elif params["model"] == "cnn_like_alexnet":
             modelo, pesos = cnn_like_alexnet.model(params)
-        elif params["model"] == "vgg16":
-            X_train *= 255
-            X_train = vgg16.preprocess_input(X_train)
-            X_val *= 255
-            X_val = vgg16.preprocess_input(X_val)
-            X_test *= 255
-            X_test = vgg16.preprocess_input(X_test)
-
-            modelo, pesos = vgg.model(params)
+        elif params["model"] in ["vgg16", "resnet101", "inceptionv3", "densenet201"]:
+            X_train, X_val, X_test = keras_application.preprocess(
+                X_train, X_val, X_test, params
+            )
+            modelo, pesos = keras_application.model(params)
 
         modelo.compile(
             loss="categorical_crossentropy",

@@ -7,14 +7,18 @@ import pickle
 import numpy as np
 import keras
 import tensorflow as tf
-from tensorflow.keras.optimizers import SGD, Adam
+from tensorflow.keras.optimizers import SGD, Adam, RMSprop
 from tensorflow.keras.callbacks import Callback
 from keras.callbacks import ModelCheckpoint, CSVLogger
 import talos
 
 from load_data import carrega_arquivo
 from models import *
-from analysis.performance_measures import print_basic_performance, calc_accuracy, calc_log_loss
+from analysis.performance_measures import (
+    print_basic_performance,
+    calc_accuracy,
+    calc_log_loss,
+)
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 gpus = tf.config.list_physical_devices("GPU")
@@ -34,7 +38,18 @@ parser.add_argument(
     "--model",
     help="Which model to train",
     default="mlp_1_hidden",
-    choices=["mlp_1_hidden", "mlp_2_hidden", "rbf", "esn", "elm", "cnn_like_alexnet"],
+    choices=[
+        "mlp_1_hidden",
+        "mlp_2_hidden",
+        "rbf",
+        "esn",
+        "elm",
+        "cnn_like_alexnet",
+        "vgg16",
+        "resnet101",
+        "inceptionv3",
+        "densenet201",
+    ],
 )
 parser.add_argument(
     "--neurons",
@@ -44,6 +59,19 @@ parser.add_argument(
 )
 parser.add_argument("--time", help="Timestamp", default=str(int(time.time())))
 parser.add_argument("--roll", help="Repetition", default=0, type=int)
+parser.add_argument("--batch", help="Batch size", default=1, type=int)
+parser.add_argument("--epoch", help="Epochs", default=200, type=int)
+parser.add_argument(
+    "--optimizer",
+    help="Optmizer",
+    default="sgd",
+    choices=["sgd", "adam", "rmsprop"],
+    type=str,
+)
+parser.add_argument("--lr", help="Learning rate", default=0.01, type=float)
+parser.add_argument("--momentum", help="Momentum", default=0.9, type=float)
+parser.add_argument("--nesterov", help="Nesterov", default=0, type=int)
+
 
 args = parser.parse_args()
 
@@ -51,6 +79,12 @@ MODEL = args.model
 NEURONS = args.neurons
 TIME = args.time
 ROLL = args.roll
+BATCH = args.batch
+EPOCH = args.epoch
+OPTIMIZER_NAME = args.optimizer
+LR = args.lr
+MOMENTUM = args.momentum
+NESTEROV = args.nesterov
 
 # https://stackoverflow.com/a/67138072
 class ClearMemory(Callback):
@@ -71,6 +105,13 @@ def cross_val_single():
     agora = TIME
     teste = MODEL
     rodada = ROLL
+
+    if OPTIMIZER_NAME == "sgd":
+        OPTIMIZER = SGD
+    elif OPTIMIZER_NAME == "adam":
+        OPTIMIZER = Adam
+    elif OPTIMIZER_NAME == "rmsprop":
+        OPTIMIZER = RMSprop
 
     caminho = "src/system/results/" + teste + "_" + agora + "/"
     if not os.path.isdir(caminho):
@@ -95,13 +136,14 @@ def cross_val_single():
         "output_shape": output_shape,
         "neurons": NEURONS,  # 64, 128, 256
         "activation": "sigmoid",
-        "batch_size": 1,
-        "epochs": 200,
-        "optimizer": SGD,
-        "learning_rate": 0.001 * 100.0,
+        "batch_size": BATCH,
+        "epochs": EPOCH,
+        "optimizer": OPTIMIZER,
+        "learning_rate": LR * 100.0,
         "model": MODEL,
         "ensemble_models": ["mlp_1_hidden", "mlp_2_hidden", "rbf", "esn", "elm"],
         "ensemble_voting": "majority",
+        "application": MODEL,
     }
 
     if os.path.isfile(caminho + "output/predicao_por_fold.npy"):
@@ -120,16 +162,29 @@ def cross_val_single():
             modelo, pesos = rbf.model(params, X_train)
         elif params["model"] == "cnn_like_alexnet":
             modelo, pesos = cnn_like_alexnet.model(params)
+        elif params["model"] in ["vgg16", "resnet101", "inceptionv3", "densenet201"]:
+            X_train, X_val, X_test = keras_application.preprocess(
+                X_train, X_val, X_test, params
+            )
+            modelo, pesos = keras_application.model(params)
+
+        learning_rate = talos.utils.lr_normalizer(
+            params["learning_rate"], params["optimizer"]
+        )
+
+        if OPTIMIZER_NAME == "sgd":
+            optimizer = SGD(
+                lr=learning_rate,
+                momentum=MOMENTUM,
+                nesterov=NESTEROV != 0,
+            )
+        elif OPTIMIZER_NAME == "adam":
+            optimizer = Adam(lr=learning_rate)
+        elif OPTIMIZER_NAME == "rmsprop":
+            optimizer = RMSprop(lr=learning_rate, epsilon=MOMENTUM)
 
         modelo.compile(
-            loss="categorical_crossentropy",
-            optimizer=params["optimizer"](
-                lr=talos.utils.lr_normalizer(
-                    params["learning_rate"], params["optimizer"]
-                )
-            ),
-            metrics=["accuracy"],
-            # run_eagerly=True,  # https://stackoverflow.com/a/67138072
+            loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
         )
 
     if params["model"] != "elm" and params["model"] != "esn":

@@ -6,5 +6,6 @@ __all__ = [
     "elm",
     "cnn_like_alexnet",
     "ensemble",
-    "vgg",
+    "keras_application",
+    "alexnet"
 ]
