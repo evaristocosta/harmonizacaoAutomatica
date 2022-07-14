@@ -113,7 +113,6 @@ def processamento_ic(arquivos_csv, rgb=False):
         indice = None
 
         for j, linha in enumerate(leitor):
-            print("Processando linha:", j + 1)
             # processamento reduziu o banco de dados a 5 colunas de infomacao:
             #    0       1      2      3        4
             # measure, chord, note, octave, duration
