@@ -10,7 +10,19 @@ parser.add_argument(
     "--model",
     help="Which model to train",
     default="mlp_1_hidden",
-    choices=["mlp_1_hidden", "mlp_2_hidden", "rbf", "esn", "elm", "cnn_like_alexnet"],
+    choices=[
+        "mlp_1_hidden",
+        "mlp_2_hidden",
+        "rbf",
+        "esn",
+        "elm",
+        "cnn_like_alexnet",
+        "alexnet",
+        "vgg16",
+        "resnet101",
+        "inceptionv3",
+        "densenet201",
+    ],
 )
 parser.add_argument("--time", help="Timestamp", default=str(int(time.time())))
 args = parser.parse_args()

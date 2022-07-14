@@ -45,6 +45,7 @@ parser.add_argument(
         "esn",
         "elm",
         "cnn_like_alexnet",
+        "alexnet",
         "vgg16",
         "resnet101",
         "inceptionv3",
@@ -128,7 +129,7 @@ def cross_val_single():
 
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
 
-    input_shape = X_train.shape[1]
+    input_shape = X_train.shape[1:]
     output_shape = Y_train.shape[1]
 
     params = {
@@ -162,6 +163,8 @@ def cross_val_single():
             modelo, pesos = rbf.model(params, X_train)
         elif params["model"] == "cnn_like_alexnet":
             modelo, pesos = cnn_like_alexnet.model(params)
+        elif params["model"] == "alexnet":
+            modelo, pesos = alexnet.model(params)
         elif params["model"] in ["vgg16", "resnet101", "inceptionv3", "densenet201"]:
             X_train, X_val, X_test = keras_application.preprocess(
                 X_train, X_val, X_test, params

@@ -19,13 +19,20 @@ import argparse
 
 # Import necessary components to build LeNet
 from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation, Flatten
-from keras.layers.convolutional import Conv2D, MaxPooling2D, ZeroPadding2D
-from keras.layers.normalization import BatchNormalization
+from keras.layers import (
+    Dense,
+    Dropout,
+    Activation,
+    Flatten,
+    Conv2D,
+    MaxPooling2D,
+    ZeroPadding2D,
+    BatchNormalization,
+)
 from keras.regularizers import l2
 
 
-def alexnet_model(img_shape=(224, 224, 3), n_classes=10, l2_reg=0.0, weights=None):
+def model(params, l2_reg=0.0, weights=None):
 
     # Initialize model
     alexnet = Sequential()
@@ -35,7 +42,7 @@ def alexnet_model(img_shape=(224, 224, 3), n_classes=10, l2_reg=0.0, weights=Non
         Conv2D(
             96,
             (11, 11),
-            input_shape=img_shape,
+            input_shape=params["input_shape"],
             padding="same",
             kernel_regularizer=l2(l2_reg),
         )
@@ -84,14 +91,14 @@ def alexnet_model(img_shape=(224, 224, 3), n_classes=10, l2_reg=0.0, weights=Non
     alexnet.add(Dropout(0.5))
 
     # Layer 8
-    alexnet.add(Dense(n_classes))
+    alexnet.add(Dense(params["output_shape"]))
     alexnet.add(BatchNormalization())
     alexnet.add(Activation("softmax"))
 
     if weights is not None:
         alexnet.load_weights(weights)
 
-    return alexnet
+    return alexnet, alexnet.get_weights()
 
 
 def parse_args():
@@ -121,7 +128,7 @@ if __name__ == "__main__":
     args = parse_args()
 
     # Create AlexNet model
-    model = alexnet_model()
+    model = model()
 
     # Print
     if args.print_model:
