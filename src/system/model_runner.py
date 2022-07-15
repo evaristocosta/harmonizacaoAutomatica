@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(1, "/home/lucas/repos/harmonizacao/src/")
+
 import argparse
 import os
 import numpy as np

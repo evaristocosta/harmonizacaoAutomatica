@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(1, "/home/lucas/repos/harmonizacao/src/")
+
 import time
 import os
 import argparse

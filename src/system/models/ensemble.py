@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(1, "/home/lucas/repos/harmonizacao/src/")
+
 import argparse
 import numpy as np
 from predict import return_model_by_name
