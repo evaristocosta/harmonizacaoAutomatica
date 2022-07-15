@@ -1,6 +1,6 @@
 import sys
 
-sys.path.insert(1, "/home/lucas/repos/harmonizacao/src/")
+sys.path.insert(1, "/home/lucas/harmonizacaoAutomatica/src/")
 
 import argparse
 import pandas as pd
