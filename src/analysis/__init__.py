@@ -1,1 +1,1 @@
-__all__ = ["friedman_test"]
+__all__ = ["friedman_test", "performance_measures"]
