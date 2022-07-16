@@ -242,8 +242,8 @@ def cross_val_single():
 
     predicao = modelo.predict(X_test)
 
-    loss = calc_log_loss(Y_test, predicao)
-    acc = calc_accuracy(Y_test, predicao)
+    loss = calc_log_loss(Y_test, np.nan_to_num(predicao))
+    acc = calc_accuracy(Y_test, np.nan_to_num(predicao))
 
     # print basic performance
     print_basic_performance(Y_test, predicao)
