@@ -8,7 +8,7 @@ LR=$5
 MOMENTUM=$6
 NESTEROV=$7
 TIMESTAMP=$(date +%s)
-ROLLS=10
+ROLLS=$8
 
 for i in $(seq $ROLLS); do
     nohup python src/system/cross_val_single.py --time $TIMESTAMP --roll $i --model $MODEL --batch $BATCH --epoch $EPOCH --optimizer $OPTIMIZER --lr $LR --momentum $MOMENTUM --nesterov $NESTEROV &> ${MODEL}_${BATCH}.out
