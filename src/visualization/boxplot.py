@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(1, '/home/lucas/harmonizacaoAutomatica/src/')
+sys.path.insert(1, '/home/lucas/repos/harmonizacao/src/')
 
 import numpy as np
 import matplotlib
