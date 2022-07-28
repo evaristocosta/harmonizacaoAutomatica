@@ -7,5 +7,6 @@ __all__ = [
     "cnn_like_alexnet",
     "ensemble",
     "keras_application",
-    "alexnet"
+    "alexnet",
+    "alexnet_optimization",
 ]

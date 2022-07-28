@@ -1,4 +1,5 @@
 import sys
+
 sys.path.insert(1, "/home/lucas/repos/harmonizacao/src/")
 
 import argparse
@@ -6,7 +7,7 @@ import os
 import numpy as np
 import keras
 import tensorflow as tf
-from tensorflow.keras.optimizers import SGD, Adam
+from tensorflow.keras.optimizers import SGD, Adam, RMSprop
 from keras.callbacks import ModelCheckpoint
 import talos
 
@@ -14,26 +15,6 @@ import talos
 from load_data import carrega, separa, carrega_arquivo
 from models import *
 from analysis.performance_measures import print_basic_performance
-
-parser = argparse.ArgumentParser(description="Model fit and train")
-parser.add_argument(
-    "-m",
-    "--model",
-    help="Which model to train",
-    default="mlp_1_hidden",
-    choices=["mlp_1_hidden", "mlp_2_hidden", "rbf", "esn", "elm", "cnn_like_alexnet"],
-)
-parser.add_argument(
-    "-o",
-    "--optimizer",
-    help="What optimizer to use",
-    default="sgd",
-    choices=["sgd", "adam"],
-)
-args = parser.parse_args()
-
-MODEL = args.model
-OPTIMIZER = args.optimizer
 
 
 def fit():
@@ -117,14 +98,25 @@ def model_fit(X_train, Y_train, X_val, Y_val, params):
         modelo, _ = rbf.model(params, X_train)
     elif params["model"] == "cnn_like_alexnet":
         modelo, _ = cnn_like_alexnet.model(params)
+    elif params["model"] == "alexnet_optimization":
+        modelo, _ = alexnet_optimization.model(params)
 
     modelo.summary()
 
+    learning_rate = talos.utils.lr_normalizer(
+        params["learning_rate"], params["optimizer"]
+    )
+
+    if params["optimizer"] == SGD:
+        optimizer = SGD(lr=learning_rate, momentum=params["momentum"])
+    elif params["optimizer"] == Adam:
+        optimizer = Adam(lr=learning_rate)
+    elif params["optimizer"] == RMSprop:
+        optimizer = RMSprop(lr=learning_rate, epsilon=params["momentum"])
+
     modelo.compile(
         loss="categorical_crossentropy",
-        optimizer=params["optimizer"](
-            lr=talos.utils.lr_normalizer(params["learning_rate"], params["optimizer"])
-        ),
+        optimizer=optimizer,
         metrics=["accuracy"],
     )
 
@@ -153,4 +145,30 @@ def model_fit(X_train, Y_train, X_val, Y_val, params):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Model fit and train")
+    parser.add_argument(
+        "-m",
+        "--model",
+        help="Which model to train",
+        default="mlp_1_hidden",
+        choices=[
+            "mlp_1_hidden",
+            "mlp_2_hidden",
+            "rbf",
+            "esn",
+            "elm",
+            "cnn_like_alexnet",
+        ],
+    )
+    parser.add_argument(
+        "-o",
+        "--optimizer",
+        help="What optimizer to use",
+        default="sgd",
+        choices=["sgd", "adam"],
+    )
+    args = parser.parse_args()
+
+    MODEL = args.model
+    OPTIMIZER = args.optimizer
     fit()

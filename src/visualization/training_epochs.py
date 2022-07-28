@@ -8,8 +8,7 @@ def main():
         description="Plot date based accuracy and loss training results"
     )
     parser.add_argument(
-        "-d",
-        "--date",
+        "date",
         help="Training date to be considered",
         type=int,
     )
