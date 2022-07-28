@@ -12,13 +12,7 @@ from sklearn.metrics import (
 
 
 # calculate from experiment results
-def calc_from_date():
-    parser = argparse.ArgumentParser(description="Performance measures helper")
-    parser.add_argument("date", type=int, help="Experiment date of execution")
-
-    args = parser.parse_args()
-    date = args.date
-
+def calc_best_from_date(date):
     # abre sumário e seleciona dados do experimento, ordenados por erro
     df = pd.read_csv("src/system/results/summary.csv")
     df = df[df["date"] == date]
@@ -37,6 +31,43 @@ def calc_from_date():
     y_pred = predicao[best_run]
 
     print_all_performance(y_true, y_pred)
+
+
+def calc_average_from_date(date):
+    # abre sumário e seleciona dados do experimento, ordenados por erro
+    df = pd.read_csv("src/system/results/summary.csv")
+    df = df[df["date"] == date]
+
+    # pega informações da melhor execução do experimento
+    experiment = str(df["experiment"].values[0])
+    print("Experiment:", experiment)
+
+    path = "src/system/results/" + experiment + "_" + str(date) + "/output/"
+
+    predicao = np.load(path + "predicao_por_fold.npy")
+    real = np.load(path + "real_por_fold.npy")
+
+    resultados = pd.DataFrame(columns=["loss", "acc", "f1", "mcc", "kappa"])
+
+    for y_true, y_pred in zip(real, predicao):
+        loss, acc, _, f1, mcc, kappa = print_all_performance(y_true, y_pred)
+        resultados = pd.concat(
+            [
+                resultados,
+                pd.DataFrame(
+                    {
+                        "loss": [loss],
+                        "acc": [acc],
+                        "f1": [f1],
+                        "mcc": [mcc],
+                        "kappa": [kappa],
+                    }
+                ),
+            ],
+            ignore_index=True,
+        )
+
+    print("\n\nMédia:\n", resultados.mean())
 
 
 # loss
@@ -118,6 +149,26 @@ def print_all_performance(y_true, y_pred):
     print("Matthews Correlation Coefficient: {:.4f}".format(mcc))
     print("Cohen's Kappa: {:.4f}".format(kappa))
 
+    return loss, acc, bacc, f1, mcc, kappa
+
 
 if __name__ == "__main__":
-    calc_from_date()
+    parser = argparse.ArgumentParser(description="Performance measures helper")
+    parser.add_argument("date", type=int, help="Experiment date of execution")
+    parser.add_argument(
+        "-c",
+        "--choice",
+        type=str,
+        help="Choice of performance measure calculation",
+        choices=["best", "average"],
+        default="best",
+    )
+
+    args = parser.parse_args()
+    date = args.date
+    choice = args.choice
+
+    if choice == "best":
+        calc_best_from_date(date)
+    elif choice == "average":
+        calc_average_from_date(date)
