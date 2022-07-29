@@ -12,7 +12,7 @@ from model_runner import model_fit
 
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 gpus = tf.config.list_physical_devices("GPU")
 if gpus:
