@@ -101,8 +101,6 @@ def model_fit(X_train, Y_train, X_val, Y_val, params):
     elif params["model"] == "alexnet_optimization":
         modelo, _ = alexnet_optimization.model(params)
 
-    modelo.summary()
-
     learning_rate = talos.utils.lr_normalizer(
         params["learning_rate"], params["optimizer"]
     )

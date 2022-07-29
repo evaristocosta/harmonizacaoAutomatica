@@ -12,7 +12,7 @@ from model_runner import model_fit
 
 import os
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 gpus = tf.config.list_physical_devices("GPU")
 if gpus:
@@ -28,22 +28,10 @@ if gpus:
 
 
 def optimizer():
-    # X, Y = carrega(data="encoded")
-    # X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=0.7)
-
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
 
     input_shape = X_train.shape[1:]
     output_shape = Y_train.shape[1]
-
-    # "input_shape"
-    # "activation"
-    # "neurons"
-    # "layer_4"
-    # "dense_1"
-    # "dense_2"
-    # "dropout"
-    # "output_shape"
 
     p = {
         # "shapes": ["funnel"],
@@ -54,7 +42,7 @@ def optimizer():
         "output_shape": [output_shape],
         "neurons": [256, 128, 512],
         "activation": ["relu", "elu"],
-        "dropout": (0.25, 0.75, 11),
+        "dropout": (0.25, 0.80, 11),
         "layer_4": [True, False],
         "dense_1": [3072, 1024, 2048],
         "dense_2": [4096, 2048, 1024],
@@ -62,7 +50,7 @@ def optimizer():
         "optimizer": [Adam, SGD, RMSprop],
         "momentum": [0.9],
         "batch_size": [64, 128, 256],
-        "epochs": (10, 100, 10),
+        "epochs": (10, 110, 10),
         "weight_regulizer": [None],
         "emb_output_dims": [None],
     }
@@ -75,16 +63,16 @@ def optimizer():
         params=p,
         model=model_fit,
         experiment_name="alexnet_optimization",
-        fraction_limit=0.15,
+        fraction_limit=0.01,
         # round_limit=30,
-        reduction_method="pearson",
-        reduction_interval=30,
-        reduction_window=15,
+        reduction_method="kendall",
+        reduction_interval=50,
+        reduction_window=25,
         reduction_threshold=0.2,
         reduction_metric="val_loss",
         minimize_loss=True,
-        random_method="uniform_mersenne",
-        seed=42,
+        # random_method="uniform_mersenne",
+        # seed=42,
         clear_session=True,
         save_weights=False,
     )
@@ -99,9 +87,10 @@ def optimizer():
     # use Scan object as input
     analyze_object = talos.Analyze(scan_object)
 
-    print_optimization_details(analyze_object)
-
     joblib.dump(analyze_object, "analyze_object.pkl")
+
+    print_optimization_details(analyze_object)
+    plot_optimization_results(analyze_object)
 
     return analyze_object
 
@@ -114,14 +103,11 @@ def print_optimization_details(analyze_object):
     print("\nHighest val_accuracy:")
     print(analyze_object.high("val_accuracy"))
 
-    """ print("\nHighest val_f1score:")
-    print(analyze_object.high("val_f1score")) """
-
     print("\nCorrelation (val_loss):")
     print(
         analyze_object.correlate(
             "val_loss",
-            ["accuracy", "loss", "val_accuracy", "f1score", "val_f1score"],
+            ["accuracy", "loss", "val_accuracy"],
         )
     )
 
@@ -164,13 +150,6 @@ def plot_optimization_results(analyze_object):
     plt.savefig(arq + "/activation_neuronios_camada_3.png") """
     # plt.show()
 
-    analyze_object.plot_corr(
-        "val_loss",
-        ["accuracy", "loss", "val_accuracy", "f1score", "val_f1score"],
-    )
-    plt.savefig(arq + "/1_correlacao_parametros.png")
-    # plt.show()
-
     analyze_object.plot_regs("val_loss", "loss")
     plt.savefig(arq + "/2_regs_loss.png")
     # plt.show()
@@ -193,6 +172,13 @@ def plot_optimization_results(analyze_object):
 
     analyze_object.plot_line("val_accuracy")
     plt.savefig(arq + "/7_historico_accuracy.png")
+    # plt.show()
+
+    analyze_object.plot_corr(
+        "val_loss",
+        ["accuracy", "loss", "val_accuracy"],
+    )
+    plt.savefig(arq + "/1_correlacao_parametros.png")
     # plt.show()
 
 
