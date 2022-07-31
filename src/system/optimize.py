@@ -63,7 +63,7 @@ def optimizer():
         params=p,
         model=model_fit,
         experiment_name="alexnet_optimization",
-        fraction_limit=0.01,
+        fraction_limit=0.1,
         # round_limit=30,
         reduction_method="kendall",
         reduction_interval=4,
