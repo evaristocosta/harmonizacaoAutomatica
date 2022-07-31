@@ -118,7 +118,7 @@ def plot_optimization_results(analyze_object):
     plt.savefig(arq + "/kde_dropout.png")
     # plt.show()
 
-    analyze_object.plot_bars("lr", "val_loss", "optimizer", "batch_size")
+    analyze_object.plot_bars("learning_rate", "val_loss", "optimizer", "batch_size")
     plt.savefig(arq + "/relacao_fit.png")
     # plt.show()
 
@@ -134,7 +134,7 @@ def plot_optimization_results(analyze_object):
     plt.savefig(arq + "/batch_size_epochs.png")
     # plt.show()
 
-    analyze_object.plot_box("lr", "val_loss", "epochs")
+    analyze_object.plot_box("learning_rate", "val_loss", "epochs")
     plt.savefig(arq + "/lr_epochs.png")
     # plt.show()
 
