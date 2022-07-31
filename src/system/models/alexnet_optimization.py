@@ -39,7 +39,7 @@ def model(params, l2_reg=0.0):
         Conv2D(
             96,
             (11, 11),
-            input_shape=params["input_shape"],
+            input_shape=eval(params["input_shape"]),
             padding="same",
             kernel_regularizer=l2(l2_reg),
         )

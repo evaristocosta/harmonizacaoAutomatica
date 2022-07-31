@@ -30,7 +30,7 @@ if gpus:
 def optimizer():
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
 
-    input_shape = X_train.shape[1:]
+    input_shape = "{0}".format(str(X_train.shape[1:]))
     output_shape = Y_train.shape[1]
 
     p = {
@@ -66,8 +66,8 @@ def optimizer():
         fraction_limit=0.01,
         # round_limit=30,
         reduction_method="kendall",
-        reduction_interval=50,
-        reduction_window=25,
+        reduction_interval=4,
+        reduction_window=2,
         reduction_threshold=0.2,
         reduction_metric="val_loss",
         minimize_loss=True,
