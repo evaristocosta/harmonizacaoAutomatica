@@ -40,17 +40,17 @@ def optimizer():
         "model": ["alexnet_optimization"],
         "input_shape": [input_shape],
         "output_shape": [output_shape],
-        "neurons": [256, 128],
+        "neurons": [256, 128, 64],
         "activation": ["relu", "elu"],
         "dropout": (0.25, 0.55, 6),
         "layer_4": [True, False],
         "dense_1": [3072, 2048, 1024],
         "dense_2": [4096, 2048, 1024],
-        "learning_rate": [0.001, 0.01, 0.0001],
-        "optimizer": [Adam, SGD, RMSprop],
-        "momentum": [0.9],
-        "batch_size": [64, 128],
-        "epochs": (10, 100, 9),
+        "learning_rate": [0.1 * 100], # [0.001, 0.01, 0.0001]
+        "optimizer": [SGD], # [Adam, SGD, RMSprop]
+        "momentum": [0.9], # [0.9]
+        "batch_size": [128], # [64, 128]
+        "epochs": [50], # (10, 100, 9)
         "weight_regulizer": [None],
         "emb_output_dims": [None],
     }
