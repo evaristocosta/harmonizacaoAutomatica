@@ -40,17 +40,17 @@ def optimizer():
         "model": ["alexnet_optimization"],
         "input_shape": [input_shape],
         "output_shape": [output_shape],
-        "neurons": [256, 128, 64],
-        "activation": ["relu", "elu"],
-        "dropout": (0.25, 0.55, 6),
-        "layer_4": [True, False],
-        "dense_1": [3072, 2048, 1024],
-        "dense_2": [4096, 2048, 1024],
-        "learning_rate": [0.1 * 100], # [0.001, 0.01, 0.0001]
-        "optimizer": [SGD], # [Adam, SGD, RMSprop]
-        "momentum": [0.9], # [0.9]
-        "batch_size": [128], # [64, 128]
-        "epochs": [50], # (10, 100, 9)
+        "neurons": [256],
+        "activation": ["elu"],
+        "dropout": [0.5],
+        "layer_4": [False],
+        "dense_1": [1024],
+        "dense_2": [1024],
+        "learning_rate": [0.001 * 100, 0.01 * 100, 0.1 * 100], 
+        "optimizer": [Adam, SGD, RMSprop], 
+        "momentum": [0.9], 
+        "batch_size": [32, 64, 128],
+        "epochs": (10, 100, 9),  
         "weight_regulizer": [None],
         "emb_output_dims": [None],
     }
@@ -62,7 +62,7 @@ def optimizer():
         y_val=Y_val,
         params=p,
         model=model_fit,
-        experiment_name="alexnet_optimization",
+        experiment_name="alexnet_optimization_2",
         fraction_limit=0.1,
         # round_limit=30,
         # reduction_method="kendall",
@@ -113,7 +113,7 @@ def print_optimization_details(analyze_object):
 
 
 def plot_optimization_results(analyze_object):
-    arq = "alexnet_optimization"
+    arq = "alexnet_optimization_2"
     analyze_object.plot_kde("dropout", "val_loss")
     plt.savefig(arq + "/kde_dropout.png")
     # plt.show()

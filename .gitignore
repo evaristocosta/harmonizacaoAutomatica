@@ -4,6 +4,7 @@
 
 ### Data ###
 *.csv
+*.png
 *.dat
 *.efx
 *.gbr
