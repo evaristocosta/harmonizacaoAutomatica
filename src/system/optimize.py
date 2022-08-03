@@ -63,7 +63,7 @@ def optimizer():
         params=p,
         model=model_fit,
         experiment_name="alexnet_optimization_2",
-        fraction_limit=0.1,
+        fraction_limit=0.25,
         # round_limit=30,
         # reduction_method="kendall",
         # reduction_interval=4,
@@ -87,7 +87,7 @@ def optimizer():
     # use Scan object as input
     analyze_object = talos.Analyze(scan_object)
 
-    joblib.dump(analyze_object, "analyze_object.pkl")
+    joblib.dump(analyze_object, "analyze_object_2.pkl")
 
     print_optimization_details(analyze_object)
     plot_optimization_results(analyze_object)
