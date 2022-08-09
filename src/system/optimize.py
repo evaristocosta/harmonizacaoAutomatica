@@ -30,7 +30,7 @@ if gpus:
 def optimizer():
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
 
-    input_shape = "{0}".format(str(X_train.shape[1:]))
+    input_shape = X_train.shape[1:]
     output_shape = Y_train.shape[1]
 
     p = {
@@ -46,11 +46,11 @@ def optimizer():
         "layer_4": [False],
         "dense_1": [1024],
         "dense_2": [1024],
-        "learning_rate": [0.001 * 100, 0.01 * 100, 0.1 * 100], 
-        "optimizer": [Adam, SGD, RMSprop], 
+        "learning_rate": [0.01 * 100], 
+        "optimizer": [SGD], 
         "momentum": [0.9], 
-        "batch_size": [32, 64, 128],
-        "epochs": (10, 100, 9),  
+        "batch_size": [64],
+        "epochs": [20],  
         "weight_regulizer": [None],
         "emb_output_dims": [None],
     }
