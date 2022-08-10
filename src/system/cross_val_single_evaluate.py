@@ -21,6 +21,7 @@ parser.add_argument(
         "elm",
         "cnn_like_alexnet",
         "alexnet",
+        "alexnet_optimization",
         "vgg16",
         "resnet101",
         "inceptionv3",
