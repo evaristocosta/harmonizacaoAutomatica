@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(1, "/home/lucas/repos/harmonizacao/src/")
+sys.path.insert(1, "/home/lucas/harmonizacaoAutomatica/src/")
 
 import gc
 import json
@@ -49,6 +49,7 @@ parser.add_argument(
         "elm",
         "cnn_like_alexnet",
         "alexnet",
+        "alexnet_optimization",
         "vgg16",
         "resnet101",
         "inceptionv3",
@@ -139,7 +140,11 @@ def cross_val_single():
         "input_shape": input_shape,
         "output_shape": output_shape,
         "neurons": NEURONS,  # 64, 128, 256
-        "activation": "sigmoid",
+        "activation": "elu",
+        "dropout": 0.5,
+        "layer_4": False,
+        "dense_1": 1024,
+        "dense_2": 1024,
         "batch_size": BATCH,
         "epochs": EPOCH,
         "optimizer": OPTIMIZER,
@@ -168,6 +173,8 @@ def cross_val_single():
             modelo, pesos = cnn_like_alexnet.model(params)
         elif params["model"] == "alexnet":
             modelo, pesos = alexnet.model(params)
+        elif params["model"] == "alexnet_optimization":
+            modelo, pesos = alexnet_optimization.model(params)
         elif params["model"] in ["vgg16", "resnet101", "inceptionv3", "densenet201"]:
             X_train, X_val, X_test = keras_application.preprocess(
                 X_train, X_val, X_test, params
