@@ -1,8 +1,8 @@
 import time
 import joblib
-import tensorflow as tf
-from tensorflow.keras.optimizers import Adam, RMSprop, SGD, Adagrad, Nadam, Adamax
-import talos
+import keras_tuner
+from tensorflow import keras
+
 
 import matplotlib.pyplot as plt
 
@@ -30,30 +30,7 @@ if gpus:
 def optimizer():
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
 
-    input_shape = X_train.shape[1:]
-    output_shape = Y_train.shape[1]
 
-    p = {
-        # "shapes": ["funnel"],
-        # "hidden_layers": [0],
-        # "first_neuron": [32],
-        "model": ["alexnet_optimization"],
-        "input_shape": [input_shape],
-        "output_shape": [output_shape],
-        "neurons": [256],
-        "activation": ["elu"],
-        "dropout": [0.5],
-        "layer_4": [False],
-        "dense_1": [1024],
-        "dense_2": [1024],
-        "learning_rate": [0.01 * 100], 
-        "optimizer": [SGD], 
-        "momentum": [0.9], 
-        "batch_size": [64],
-        "epochs": [20],  
-        "weight_regulizer": [None],
-        "emb_output_dims": [None],
-    }
 
     scan_object = talos.Scan(
         X_train,
