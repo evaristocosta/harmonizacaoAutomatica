@@ -106,4 +106,4 @@ def model(hp, l2_reg=0.0):
             loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
         )
 
-    return alexnet, alexnet.get_weights()
+    return alexnet

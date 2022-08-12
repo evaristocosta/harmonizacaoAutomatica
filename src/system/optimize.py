@@ -1,8 +1,8 @@
 import time
 import joblib
-import keras_tuner
-from tensorflow import keras
-
+import tensorflow as tf
+from tensorflow.keras.optimizers import Adam, RMSprop, SGD, Adagrad, Nadam, Adamax
+import talos
 
 import matplotlib.pyplot as plt
 
@@ -12,7 +12,7 @@ from model_runner import model_fit
 
 import os
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 gpus = tf.config.list_physical_devices("GPU")
 if gpus:
@@ -30,7 +30,30 @@ if gpus:
 def optimizer():
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
 
+    input_shape = X_train.shape[1:]
+    output_shape = Y_train.shape[1]
 
+    p = {
+        # "shapes": ["funnel"],
+        # "hidden_layers": [0],
+        # "first_neuron": [32],
+        "model": ["alexnet_optimization"],
+        "input_shape": [input_shape],
+        "output_shape": [output_shape],
+        "neurons": [256, 128, 512],
+        "activation": ["relu", "elu"],
+        "dropout": (0.25, 0.80, 11),
+        "layer_4": [True, False],
+        "dense_1": [3072, 1024, 2048],
+        "dense_2": [4096, 2048, 1024],
+        "learning_rate": [0.001, 0.01, 0.0001],
+        "optimizer": [Adam, SGD, RMSprop],
+        "momentum": [0.9],
+        "batch_size": [64, 128, 256],
+        "epochs": (10, 110, 10),
+        "weight_regulizer": [None],
+        "emb_output_dims": [None],
+    }
 
     scan_object = talos.Scan(
         X_train,
@@ -39,15 +62,15 @@ def optimizer():
         y_val=Y_val,
         params=p,
         model=model_fit,
-        experiment_name="alexnet_optimization_2",
-        fraction_limit=0.25,
+        experiment_name="alexnet_optimization",
+        fraction_limit=0.01,
         # round_limit=30,
-        # reduction_method="kendall",
-        # reduction_interval=4,
-        # reduction_window=2,
-        # reduction_threshold=0.2,
-        # reduction_metric="val_loss",
-        # minimize_loss=True,
+        reduction_method="kendall",
+        reduction_interval=50,
+        reduction_window=25,
+        reduction_threshold=0.2,
+        reduction_metric="val_loss",
+        minimize_loss=True,
         # random_method="uniform_mersenne",
         # seed=42,
         clear_session=True,
@@ -64,7 +87,7 @@ def optimizer():
     # use Scan object as input
     analyze_object = talos.Analyze(scan_object)
 
-    joblib.dump(analyze_object, "analyze_object_2.pkl")
+    joblib.dump(analyze_object, "analyze_object.pkl")
 
     print_optimization_details(analyze_object)
     plot_optimization_results(analyze_object)
@@ -90,12 +113,12 @@ def print_optimization_details(analyze_object):
 
 
 def plot_optimization_results(analyze_object):
-    arq = "alexnet_optimization_2"
+    arq = "alexnet_optimization"
     analyze_object.plot_kde("dropout", "val_loss")
     plt.savefig(arq + "/kde_dropout.png")
     # plt.show()
 
-    analyze_object.plot_bars("learning_rate", "val_loss", "optimizer", "batch_size")
+    analyze_object.plot_bars("lr", "val_loss", "optimizer", "batch_size")
     plt.savefig(arq + "/relacao_fit.png")
     # plt.show()
 
@@ -111,7 +134,7 @@ def plot_optimization_results(analyze_object):
     plt.savefig(arq + "/batch_size_epochs.png")
     # plt.show()
 
-    analyze_object.plot_box("learning_rate", "val_loss", "epochs")
+    analyze_object.plot_box("lr", "val_loss", "epochs")
     plt.savefig(arq + "/lr_epochs.png")
     # plt.show()
 
