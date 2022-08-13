@@ -49,7 +49,7 @@ def optimizer():
         X_train,
         Y_train,
         epochs=100,
-        batch_size=64,
+        batch_size=16,
         validation_data=(X_val, Y_val),
         callbacks=[stop_early, tensorboard],
     )
