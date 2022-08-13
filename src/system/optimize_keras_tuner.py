@@ -31,6 +31,7 @@ def optimizer():
     model = alexnet_optimization.model
 
     tuner = keras_tuner.Hyperband(
+        max_epochs=50,
         hypermodel=model,
         objective="val_loss",
         directory="src/system/results",
@@ -48,6 +49,7 @@ def optimizer():
         X_train,
         Y_train,
         epochs=100,
+        batch_size=64,
         validation_data=(X_val, Y_val),
         callbacks=[stop_early, tensorboard],
     )
