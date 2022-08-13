@@ -94,13 +94,13 @@ def model(hp, l2_reg=0.0):
 
     if optimizer_name == "sgd":
         optimizer = SGD(
-            lr=learning_rate,
+            learning_rate=learning_rate,
             momentum=0.9,
         )
     elif optimizer_name == "adam":
-        optimizer = Adam(lr=learning_rate)
+        optimizer = Adam(learning_rate=learning_rate)
     elif optimizer_name == "rmsprop":
-        optimizer = RMSprop(lr=learning_rate, epsilon=0.9)
+        optimizer = RMSprop(learning_rate=learning_rate, epsilon=0.9)
 
     alexnet.compile(
             loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]

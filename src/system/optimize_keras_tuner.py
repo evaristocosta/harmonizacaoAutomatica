@@ -6,7 +6,7 @@ import tensorflow as tf
 
 
 from load_data import carrega, separa, carrega_arquivo
-from models.alexnet_optimization import model
+from models import alexnet_optimization
 
 
 import os
@@ -28,11 +28,11 @@ if gpus:
 
 def optimizer():
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
+    model = alexnet_optimization.model
 
     tuner = keras_tuner.Hyperband(
         hypermodel=model,
         objective="val_loss",
-        max_trials=100,
         directory="src/system/results",
         project_name="alexnet_optimization_keras",
     )
