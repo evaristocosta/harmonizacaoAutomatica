@@ -33,6 +33,7 @@ def optimizer():
     tuner = keras_tuner.Hyperband(
         max_epochs=50,
         hypermodel=model,
+        distribution_strategy=tf.distribute.MirroredStrategy(),
         objective="val_loss",
         directory="src/system/results",
         project_name="alexnet_optimization_keras",
