@@ -102,6 +102,8 @@ def model(hp, l2_reg=0.0):
     elif optimizer_name == "rmsprop":
         optimizer = RMSprop(learning_rate=learning_rate, epsilon=0.9)
 
+    print(alexnet.summary())
+
     alexnet.compile(
             loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
         )
