@@ -31,7 +31,7 @@ def optimizer():
     model = alexnet_optimization.model
 
     tuner = keras_tuner.Hyperband(
-        max_epochs=50,
+        max_epochs=10,
         hypermodel=model,
         distribution_strategy=tf.distribute.MirroredStrategy(),
         objective="val_loss",
