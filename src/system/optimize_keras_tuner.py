@@ -30,11 +30,19 @@ def optimizer():
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
     model = alexnet_optimization.model
 
-    tuner = keras_tuner.Hyperband(
+    """ tuner = keras_tuner.Hyperband(
         max_epochs=10,
         hypermodel=model,
         distribution_strategy=tf.distribute.MirroredStrategy(),
         objective="val_loss",
+        directory="src/system/results",
+        project_name="alexnet_optimization_keras",
+    ) """
+
+    tuner = keras_tuner.BayesianOptimization(
+        hypermodel=model,
+        objective="val_loss",
+        distribution_strategy=tf.distribute.MirroredStrategy(),
         directory="src/system/results",
         project_name="alexnet_optimization_keras",
     )
