@@ -28,6 +28,8 @@ if gpus:
 
 def optimizer():
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
+    del X_test, Y_test
+    
     model = alexnet_optimization.model
 
     """ tuner = keras_tuner.Hyperband(
