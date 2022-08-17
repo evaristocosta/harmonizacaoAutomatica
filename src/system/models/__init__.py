@@ -9,4 +9,5 @@ __all__ = [
     "keras_application",
     "alexnet",
     "alexnet_optimization",
+    "alexnet_optimization_2",
 ]

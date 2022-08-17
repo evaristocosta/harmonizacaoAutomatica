@@ -1,12 +1,11 @@
-import time
 import joblib
 import keras_tuner
 from tensorflow import keras
 import tensorflow as tf
 
 
-from load_data import carrega, separa, carrega_arquivo
-from models import alexnet_optimization
+from load_data import carrega_arquivo
+from models import alexnet_optimization_2
 
 
 import os
@@ -30,7 +29,7 @@ def optimizer():
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
     del X_test, Y_test
     
-    model = alexnet_optimization.model
+    model = alexnet_optimization_2.model
 
     """ tuner = keras_tuner.Hyperband(
         max_epochs=10,
@@ -46,12 +45,12 @@ def optimizer():
         objective="val_loss",
         distribution_strategy=tf.distribute.MirroredStrategy(),
         directory="src/system/results",
-        project_name="alexnet_optimization_keras",
+        project_name="alexnet_optimization_keras_2",
     )
 
     stop_early = keras.callbacks.EarlyStopping(monitor="val_loss", patience=25)
     tensorboard = keras.callbacks.TensorBoard(
-        log_dir="src/system/results/alexnet_optimization_keras/logs",
+        log_dir="src/system/results/alexnet_optimization_keras_2/logs",
     )
 
     tuner.search_space_summary()
@@ -74,7 +73,7 @@ def optimizer():
     print(best_hps)
 
     model = tuner.hypermodel.build(best_hps)
-    joblib.dump(model, "src/system/results/alexnet_optimization_keras/best_model.pkl")
+    joblib.dump(model, "src/system/results/alexnet_optimization_keras_2/best_model.pkl")
 
 
 if __name__ == "__main__":
