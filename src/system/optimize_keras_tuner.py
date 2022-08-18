@@ -5,7 +5,7 @@ import tensorflow as tf
 
 
 from load_data import carrega_arquivo
-from models import alexnet_optimization_2
+from models import alexnet_optimization_3
 
 
 import os
@@ -28,8 +28,8 @@ if gpus:
 def optimizer():
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
     del X_test, Y_test
-    
-    model = alexnet_optimization_2.model
+
+    model = alexnet_optimization_3.model
 
     """ tuner = keras_tuner.Hyperband(
         max_epochs=10,
@@ -37,7 +37,7 @@ def optimizer():
         distribution_strategy=tf.distribute.MirroredStrategy(),
         objective="val_loss",
         directory="src/system/results",
-        project_name="alexnet_optimization_keras",
+        project_name="alexnet_optimization_keras_3",
     ) """
 
     tuner = keras_tuner.BayesianOptimization(
@@ -45,12 +45,12 @@ def optimizer():
         objective="val_loss",
         distribution_strategy=tf.distribute.MirroredStrategy(),
         directory="src/system/results",
-        project_name="alexnet_optimization_keras_2",
+        project_name="alexnet_optimization_keras_3",
     )
 
     stop_early = keras.callbacks.EarlyStopping(monitor="val_loss", patience=25)
     tensorboard = keras.callbacks.TensorBoard(
-        log_dir="src/system/results/alexnet_optimization_keras_2/logs",
+        log_dir="src/system/results/alexnet_optimization_keras_3/logs",
     )
 
     tuner.search_space_summary()
@@ -73,7 +73,7 @@ def optimizer():
     print(best_hps)
 
     model = tuner.hypermodel.build(best_hps)
-    joblib.dump(model, "src/system/results/alexnet_optimization_keras_2/best_model.pkl")
+    joblib.dump(model, "src/system/results/alexnet_optimization_keras_3/best_model.pkl")
 
 
 if __name__ == "__main__":

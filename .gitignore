@@ -21,6 +21,8 @@
 *.pkl
 *.json
 *.7z
+*.v2
+checkpoint*
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
