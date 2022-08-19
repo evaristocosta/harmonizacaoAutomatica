@@ -14,7 +14,6 @@ import tensorflow as tf
 from tensorflow.keras.optimizers import SGD, Adam, RMSprop
 from tensorflow.keras.callbacks import Callback
 from keras.callbacks import ModelCheckpoint, CSVLogger
-import talos
 
 from load_data import carrega_arquivo
 from models import *
