@@ -21,7 +21,7 @@ def main():
 
     # pega informações da melhor execução do experimento
     experiment = df["experiment"].values[0]
-    best_run = df["best_run"].values[0] - 1
+    best_run = df["best_run"].values[0]
 
     print("Experiment:", experiment)
     path = f"src/system/results/{experiment}_{date}/logs/{best_run}.csv"

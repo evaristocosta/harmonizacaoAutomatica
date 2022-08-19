@@ -1,4 +1,5 @@
 import sys
+
 sys.path.insert(1, "/home/lucas/harmonizacaoAutomatica/src/")
 
 import argparse
@@ -90,7 +91,7 @@ def plot_confusion_matrix(
     cm = confusion_matrix(y_true_cat, y_pred_cat)
 
     if normalize:
-        cm = cm / cm.astype(np.float).sum(axis=1)
+        cm = cm / cm.astype(float).sum(axis=1)
 
     # inicia construcao da imagem
     fig, ax = plt.subplots()

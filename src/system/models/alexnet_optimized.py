@@ -29,7 +29,7 @@ from tensorflow.keras.layers import (
 from tensorflow.keras.regularizers import l2
 
 
-def model(params, l2_reg=0.0):
+def model(l2_reg=0.0):
     # Initialize model
     alexnet = Sequential()
 
@@ -47,11 +47,15 @@ def model(params, l2_reg=0.0):
     alexnet.add(Activation("relu"))
     alexnet.add(MaxPooling2D(pool_size=(2, 2)))
 
+    alexnet.add(Dropout(0.25))
+
     # Layer 2
     alexnet.add(Conv2D(64, (5, 5), padding="same"))
     alexnet.add(BatchNormalization())
     alexnet.add(Activation("relu"))
     alexnet.add(MaxPooling2D(pool_size=(2, 2)))
+
+    alexnet.add(Dropout(0.25))
 
     # Layer 3, 4 e 5
     for i in range(3):
@@ -63,6 +67,8 @@ def model(params, l2_reg=0.0):
         # se 1 é impar, então:
         if i % 2 == 1:
             alexnet.add(MaxPooling2D(pool_size=(2, 2)))
+
+        alexnet.add(Dropout(0.25))
 
     # -------
     # Layer 6 (excluido)

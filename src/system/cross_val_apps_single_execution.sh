@@ -25,4 +25,4 @@ python src/system/cross_val_single_evaluate.py --time $TIMESTAMP --model $MODEL
 
 # src/system/cross_val_apps_single_execution.sh alexnet_optimization 64 20 sgd 1 0.9 0 10 0 &
 
-# src/system/cross_val_apps_single_execution.sh alexnet_optimized 64 20 adam 1e-3 0.9 0 30 0 &
+# src/system/cross_val_apps_single_execution.sh alexnet_optimized 64 50 adam 1e-3 0.9 0 30 0 &
