@@ -10,4 +10,6 @@ __all__ = [
     "alexnet",
     "alexnet_optimization",
     "alexnet_optimization_2",
+    "alexnet_optimization_3",
+    "alexnet_optimized",
 ]

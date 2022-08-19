@@ -1,4 +1,5 @@
 import sys
+
 sys.path.insert(1, "/home/lucas/harmonizacaoAutomatica/src/")
 
 import gc
@@ -50,6 +51,7 @@ parser.add_argument(
         "cnn_like_alexnet",
         "alexnet",
         "alexnet_optimization",
+        "alexnet_optimized",
         "vgg16",
         "resnet101",
         "inceptionv3",
@@ -175,15 +177,19 @@ def cross_val_single():
             modelo, pesos = alexnet.model(params)
         elif params["model"] == "alexnet_optimization":
             modelo, pesos = alexnet_optimization.model(params)
+        elif params["model"] == "alexnet_optimized":
+            modelo, pesos = alexnet_optimized.model(params)
         elif params["model"] in ["vgg16", "resnet101", "inceptionv3", "densenet201"]:
             X_train, X_val, X_test = keras_application.preprocess(
                 X_train, X_val, X_test, params
             )
             modelo, pesos = keras_application.model(params)
 
-        learning_rate = talos.utils.lr_normalizer(
+        """ learning_rate = talos.utils.lr_normalizer(
             params["learning_rate"], params["optimizer"]
-        )
+        ) """
+
+        learning_rate = params["learning_rate"]
 
         if OPTIMIZER_NAME == "sgd":
             optimizer = SGD(

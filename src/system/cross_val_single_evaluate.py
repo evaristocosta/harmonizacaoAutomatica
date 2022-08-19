@@ -1,4 +1,5 @@
 import sys
+
 sys.path.insert(1, "/home/lucas/harmonizacaoAutomatica/src/")
 
 import time
@@ -22,6 +23,7 @@ parser.add_argument(
         "cnn_like_alexnet",
         "alexnet",
         "alexnet_optimization",
+        "alexnet_optimized",
         "vgg16",
         "resnet101",
         "inceptionv3",

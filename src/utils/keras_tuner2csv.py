@@ -28,14 +28,14 @@ def main():
     # create csv file with headers only
     colunas = [
         "id",
-        "activation",
-        "neurons",
-        "dropout",
+        # "activation",
+        # "neurons",
+        # "dropout",
         "cnn_layers",
-        "dense_layer",
+        # "dense_layer",
         "dense_2",
         "learning_rate",
-        "optimizer",
+        # "optimizer",
         "best_step",
         "loss",
         "accuracy",
@@ -51,14 +51,14 @@ def main():
 
             id = data["trial_id"]
 
-            activation = data["hyperparameters"]["values"]["activation"]
-            neurons = data["hyperparameters"]["values"]["neurons"]
-            dropout = data["hyperparameters"]["values"]["dropout"]
+            # activation = data["hyperparameters"]["values"]["activation"]
+            # neurons = data["hyperparameters"]["values"]["neurons"]
+            # dropout = data["hyperparameters"]["values"]["dropout"]
             cnn_layers = data["hyperparameters"]["values"]["cnn_layers"]
-            dense_layer = data["hyperparameters"]["values"]["dense_layer"]
+            # dense_layer = data["hyperparameters"]["values"]["dense_layer"]
             dense_2 = data["hyperparameters"]["values"]["dense_2"]
             learning_rate = data["hyperparameters"]["values"]["learning_rate"]
-            optimizer = data["hyperparameters"]["values"]["optimizer"]
+            # optimizer = data["hyperparameters"]["values"]["optimizer"]
 
             best_step = data["best_step"]
 
@@ -78,14 +78,14 @@ def main():
                 data=[
                     [
                         id,
-                        activation,
-                        neurons,
-                        dropout,
+                        # activation,
+                        # neurons,
+                        # dropout,
                         cnn_layers,
-                        dense_layer,
+                        # dense_layer,
                         dense_2,
                         learning_rate,
-                        optimizer,
+                        # optimizer,
                         best_step,
                         loss,
                         accuracy,
