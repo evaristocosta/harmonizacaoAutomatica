@@ -27,4 +27,4 @@ sudo poweroff
 
 # src/system/cross_val_apps_single_execution.sh alexnet_optimization 64 20 sgd 1 0.9 0 10 0 &
 
-# src/system/cross_val_apps_single_execution.sh alexnet_optimized 64 50 adam 1e-3 0.9 0 30 0 &
+# src/system/cross_val_apps_single_execution.sh alexnet_optimized 16 50 adam 1e-3 0.9 0 30 0 &
