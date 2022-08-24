@@ -180,7 +180,7 @@ def cross_val_single():
         elif params["model"] == "alexnet_optimized":
             modelo, pesos = alexnet_optimized.model()
         elif params["model"] == "alexnet_manual":
-            modelo, pesos = alexnet_manual.model()
+            modelo, pesos = alexnet_manual.model(params)
         elif params["model"] in ["vgg16", "resnet101", "inceptionv3", "densenet201"]:
             X_train, X_val, X_test = keras_application.preprocess(
                 X_train, X_val, X_test, params
