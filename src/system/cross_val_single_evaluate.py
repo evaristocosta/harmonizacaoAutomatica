@@ -24,6 +24,7 @@ parser.add_argument(
         "alexnet",
         "alexnet_optimization",
         "alexnet_optimized",
+        "alexnet_manual",
         "vgg16",
         "resnet101",
         "inceptionv3",

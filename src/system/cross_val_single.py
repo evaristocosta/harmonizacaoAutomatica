@@ -51,6 +51,7 @@ parser.add_argument(
         "alexnet",
         "alexnet_optimization",
         "alexnet_optimized",
+        "alexnet_manual",
         "vgg16",
         "resnet101",
         "inceptionv3",
@@ -138,18 +139,18 @@ def cross_val_single():
     output_shape = Y_train.shape[1]
 
     params = {
+        "activation": "elu",
+        "dropout": 0.30,
+        "dense_1": 128,
+        "dense_2": 128,
+        "learning_rate": 0.1,
+        "optimizer": "adam",
+        "batch_size": 32,
+        "epochs": 300,
         "input_shape": input_shape,
         "output_shape": output_shape,
         "neurons": NEURONS,  # 64, 128, 256
-        "activation": "elu",
-        "dropout": 0.5,
         "layer_4": False,
-        "dense_1": 1024,
-        "dense_2": 1024,
-        "batch_size": BATCH,
-        "epochs": EPOCH,
-        "optimizer": OPTIMIZER,
-        "learning_rate": LR * 100.0,
         "model": MODEL,
         "ensemble_models": ["mlp_1_hidden", "mlp_2_hidden", "rbf", "esn", "elm"],
         "ensemble_voting": "majority",
@@ -178,6 +179,8 @@ def cross_val_single():
             modelo, pesos = alexnet_optimization.model(params)
         elif params["model"] == "alexnet_optimized":
             modelo, pesos = alexnet_optimized.model()
+        elif params["model"] == "alexnet_manual":
+            modelo, pesos = alexnet_manual.model()
         elif params["model"] in ["vgg16", "resnet101", "inceptionv3", "densenet201"]:
             X_train, X_val, X_test = keras_application.preprocess(
                 X_train, X_val, X_test, params
@@ -192,14 +195,14 @@ def cross_val_single():
 
         if OPTIMIZER_NAME == "sgd":
             optimizer = SGD(
-                lr=learning_rate,
+                learning_rate=learning_rate,
                 momentum=MOMENTUM,
                 nesterov=NESTEROV != 0,
             )
         elif OPTIMIZER_NAME == "adam":
-            optimizer = Adam(lr=learning_rate)
+            optimizer = Adam(learning_rate=learning_rate)
         elif OPTIMIZER_NAME == "rmsprop":
-            optimizer = RMSprop(lr=learning_rate, epsilon=MOMENTUM)
+            optimizer = RMSprop(learning_rate=learning_rate, epsilon=MOMENTUM)
 
         modelo.compile(
             loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"]
