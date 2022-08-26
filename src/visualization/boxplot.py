@@ -1,5 +1,6 @@
 import sys
-sys.path.insert(1, '/home/lucas/repos/harmonizacao/src/')
+
+sys.path.insert(1, "/home/lucas/repos/harmonizacao/src/")
 
 import numpy as np
 import matplotlib
@@ -25,6 +26,6 @@ tests = [
 
 plt.boxplot(losses, patch_artist=True, showfliers=True)
 plt.ylabel("Loss", fontsize=14)
-plt.xticks(np.arange(1, len(tests) +1 ), tests)
+plt.xticks(np.arange(1, len(tests) + 1), tests)
 
 plt.show()
