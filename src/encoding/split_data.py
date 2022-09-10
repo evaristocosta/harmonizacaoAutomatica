@@ -8,7 +8,7 @@ parser.add_argument(
     "--data",
     help="Dados a serem separados",
     default="encoded",
-    choices=["encoded", "separated"],
+    choices=["encoded", "separated", "balanced"],
 )
 parser.add_argument(
     "-r", "--ratio", help="Porcentagem de treinamento", type=float, default=0.6

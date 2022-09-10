@@ -3,28 +3,40 @@ import numpy as np
 from imblearn.under_sampling import (
     RandomUnderSampler,
     NearMiss,
-    EditedNearestNeighbours,
-    RepeatedEditedNearestNeighbours,
-    AllKNN,
     CondensedNearestNeighbour,
-    OneSidedSelection,
-    NeighbourhoodCleaningRule,
 )
 from collections import Counter
 
+import argparse
+
+parser = argparse.ArgumentParser(description="Data balancer")
+
+parser.add_argument(
+    "-d",
+    "--dataset",
+    help="Qual tipo de dados usar (st: standard, fl: filtered, ec: encoded, sp: separated)",
+    default="sp",
+    choices=["st", "fl", "ec", "sp"],
+)
+args = parser.parse_args()
+DATASET = args.dataset
+
 functions = [
     RandomUnderSampler(),
-    NearMiss(),
-    #EditedNearestNeighbours(),
-    #RepeatedEditedNearestNeighbours(),
-    #AllKNN(),
-    CondensedNearestNeighbour(),
-    #OneSidedSelection(),
-    #NeighbourhoodCleaningRule(),
+    # NearMiss(),
+    # CondensedNearestNeighbour(),
 ]
 
 
-data = "separated"
+if DATASET == "st":
+    data = "standardized"
+elif DATASET == "fl":
+    data = "filtered"
+elif DATASET == "ec":
+    data = "encoded"
+elif DATASET == "sp":
+    data = "separated"
+
 
 X = np.load("data/" + data + "/vetor_entrada.npy", mmap_mode="r")
 Y = np.load("data/" + data + "/vetor_saida.npy", mmap_mode="r")
@@ -37,7 +49,7 @@ for ros in functions:
     print(ros)
     X_resampled, Y_resampled = ros.fit_resample(X_reshaped, Y)
 
-    """ X_resampled_reshaped = np.reshape(
+    X_resampled_reshaped = np.reshape(
         X_resampled, ((X_resampled.shape[0],) + original_input_shape)
     )
 
@@ -50,7 +62,7 @@ for ros in functions:
         os.remove("data/balanced/vetor_saida.npy")
 
     np.save("data/balanced/vetor_entrada.npy", X_resampled_reshaped)
-    np.save("data/balanced/vetor_saida.npy", Y_resampled) """
+    np.save("data/balanced/vetor_saida.npy", Y_resampled)
 
     Y_cat = np.argmax(Y_resampled, axis=1)
     print(sorted(Counter(Y_cat).items()))
