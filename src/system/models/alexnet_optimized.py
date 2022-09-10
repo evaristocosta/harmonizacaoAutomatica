@@ -81,7 +81,7 @@ def model(l2_reg=0.0):
     alexnet.add(Dropout(0.25))
 
     # Layer 8
-    alexnet.add(Dense(24))
+    alexnet.add(Dense(7))
     alexnet.add(BatchNormalization())
     alexnet.add(Activation("softmax"))
 
