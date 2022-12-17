@@ -85,7 +85,7 @@ def cria_sequencia_notas(primeira_nota, nota, ultima_nota, quantidade):
     return sequencia
 
 
-def processamento_ic(arquivos_csv, rgb=False):
+def processamento_ic(arquivos_csv, rgb=False, nome="vetor"):
     dicio_acordes_tamanho = len(dicio_acordes)
 
     # declaracao das matrizes
@@ -93,8 +93,8 @@ def processamento_ic(arquivos_csv, rgb=False):
     matriz_dados_saida = []
 
     # arquivos de salvamento
-    vetor_entrada = NpyAppendArray("data/encoded/vetor_entrada.npy")
-    vetor_saida = NpyAppendArray("data/encoded/vetor_saida.npy")
+    vetor_entrada = NpyAppendArray(f"data/encoded/{nome}_entrada.npy")
+    vetor_saida = NpyAppendArray(f"data/encoded/{nome}_saida.npy")
 
     # construcao das matrizes a partir dos arquivos csv
     for i, caminho_csv in enumerate(arquivos_csv):

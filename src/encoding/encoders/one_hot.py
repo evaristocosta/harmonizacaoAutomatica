@@ -5,7 +5,7 @@ from .dictionary import dicio_notas, dicio_acordes
 from .one_hot_function import codificacao_one_hot
 
 
-def processamento_one_hot(arquivos_csv):
+def processamento_one_hot(arquivos_csv, nome="vetor"):
     # pega tamanho dos dicionarios
     dicio_notas_tamanho = len(dicio_notas) - 1  # -1 para o rest
     dicio_acordes_tamanho = len(dicio_acordes)
@@ -15,8 +15,8 @@ def processamento_one_hot(arquivos_csv):
     matriz_dados_saida = []
 
     # arquivos de salvamento
-    vetor_entrada = NpyAppendArray("data/encoded/vetor_entrada.npy")
-    vetor_saida = NpyAppendArray("data/encoded/vetor_saida.npy")
+    vetor_entrada = NpyAppendArray(f"data/encoded/{nome}_entrada.npy")
+    vetor_saida = NpyAppendArray(f"data/encoded/{nome}_saida.npy")
 
     # construcao das matrizes a partir dos arquivos csv
     for i, caminho_csv in enumerate(arquivos_csv):
@@ -75,6 +75,9 @@ def processamento_one_hot(arquivos_csv):
 
         # ultima sequencia de notas do ultimo compasso da musica atual
         sequencia_notas = np.sum(sequencia_notas, axis=0)
+
+        # normaliza o vetor
+        sequencia_notas = sequencia_notas / max(sequencia_notas)
 
         matriz_dados_entrada.append(sequencia_notas)
 

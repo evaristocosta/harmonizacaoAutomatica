@@ -1,5 +1,6 @@
 import sys
-sys.path.insert(1, "/home/lucas/harmonizacaoAutomatica/src/")
+
+sys.path.insert(1, "/home/lucas/repos/harmonizacaoAutomatica/src/")
 
 import argparse
 import pickle
@@ -8,6 +9,7 @@ import re
 import os
 import pandas as pd
 import numpy as np
+import glob
 from keras.models import load_model
 
 from load_data import carrega, separa, carrega_arquivo
@@ -42,16 +44,26 @@ def main():
     parser.add_argument("--no-recall", dest="recall", action="store_false")
     parser.set_defaults(recall=False)
 
+    parser.add_argument(
+        "--single", dest="single", action="store_true", help="Predict single?"
+    )
+    parser.add_argument("--no-single", dest="single", action="store_false")
+    parser.set_defaults(single=False)
+
     args = parser.parse_args()
     DATE = args.date
     SEPARATE = args.separate
     PRINT_CHORDS = args.print_chords
     RECALL = args.recall
+    SINGLE = args.single
 
     if RECALL:
         recall(DATE)
     else:
-        predict(DATE, SEPARATE, PRINT_CHORDS)
+        if SINGLE:
+            predict_single(DATE, PRINT_CHORDS)
+        else:
+            predict(DATE, SEPARATE, PRINT_CHORDS)
 
 
 def predict(DATE, SEPARATE, PRINT_CHORDS):
@@ -68,6 +80,27 @@ def predict(DATE, SEPARATE, PRINT_CHORDS):
     if PRINT_CHORDS:
         acordes_df = print_acordes(Y, predicao)
         print(acordes_df.to_string())
+
+
+def predict_single(DATE, PRINT_CHORDS):
+    modelo = return_model_by_date(DATE)
+
+    caminho_lista = "data/filtered/*.csv"
+    arquivos_lista = glob.glob(caminho_lista)
+
+    for arquivo in arquivos_lista:
+        nome = os.path.basename(arquivo).split(".")[0]
+        print("\n#####\n" + nome)
+        if os.path.isfile(f"data/encoded/{nome}_entrada.npy"):
+            X = np.load(f"data/encoded/{nome}_entrada.npy", mmap_mode="r")
+            Y = np.load(f"data/encoded/{nome}_saida.npy", mmap_mode="r")
+
+            predicao = modelo.predict(X, verbose=0)
+            print_basic_performance(Y, predicao)
+
+            if PRINT_CHORDS:
+                acordes_df = print_acordes(Y, predicao)
+                print(acordes_df.to_string())
 
 
 def return_model(experiment, best_run, path):

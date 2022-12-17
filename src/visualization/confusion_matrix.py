@@ -8,6 +8,11 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 import matplotlib
 import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set(rc={"figure.figsize": (8, 7)})
+sns.set_theme(context="talk", style="white")
+np.set_printoptions(threshold=np.inf)
 
 
 def main():
@@ -23,34 +28,35 @@ def main():
     DATE = args.date
 
     dicio_acordes = [
-        "C maj",
-        "C min",
-        "C# maj",
-        "C# min",
-        "D maj",
-        "D min",
-        "D# maj",
-        "D# min",
-        "E maj",
-        "E min",
-        "F maj",
-        "F min",
-        "F# maj",
-        "F# min",
-        "G maj",
-        "G min",
-        "G# maj",
-        "G# min",
-        "A maj",
-        "A min",
-        "A# maj",
-        "A# min",
-        "B maj",
-        "B min",
+        "C",
+        "Cm",
+        "C#",
+        "C#m",
+        "D",
+        "Dm",
+        "D#",
+        "D#m",
+        "E",
+        "Em",
+        "F",
+        "Fm",
+        "F#",
+        "F#m",
+        "G",
+        "Gm",
+        "G#",
+        "G#m",
+        "A",
+        "Am",
+        "A#",
+        "A#m",
+        "B",
+        "Bm",
     ]
     class_names = np.array(dicio_acordes)
 
     plot_confusion_matrix(classes=class_names, date=DATE, normalize=True)
+    plt.grid(linestyle="--", linewidth=0.5)
     plt.show()
 
 
@@ -105,11 +111,17 @@ def plot_confusion_matrix(
         xticklabels=classes,
         yticklabels=classes,
     )
-    ax.set_ylabel("True label", fontsize=17)
-    ax.set_xlabel("Predicted label", fontsize=17)
+    ax.set_ylabel("Verdadeiro", fontsize=17)
+    ax.set_xlabel("Predito", fontsize=17)
 
     # Rotate the tick labels and set their alignment.
-    plt.setp(ax.get_xticklabels(), rotation=90, ha="right", rotation_mode="anchor")
+    plt.setp(
+        ax.get_xticklabels(),
+        rotation=90,
+        ha="right",
+        va="center",
+        rotation_mode="anchor",
+    )
 
     # Loop over data dimensions and create text annotations.
     if anotacoes:

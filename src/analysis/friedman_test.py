@@ -2,7 +2,7 @@ from scipy import stats
 import pandas as pd
 
 # seleciona melhores manualmente, array de dates
-bests = [
+""" bests = [
     1649169086,
     1649239086,
     1649299088,
@@ -11,6 +11,14 @@ bests = [
     1649556804,
     1649556868,
     1649556910,
+] """
+
+bests = [
+    1657886983,
+    1658031664,
+    1657939250,
+    1658147560,
+    1658192737,
 ]
 
 

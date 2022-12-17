@@ -9,12 +9,14 @@ import keras
 import tensorflow as tf
 from tensorflow.keras.optimizers import SGD, Adam, RMSprop
 from keras.callbacks import ModelCheckpoint
-import talos
 
 
 from load_data import carrega, separa, carrega_arquivo
 from models import *
 from analysis.performance_measures import print_basic_performance
+
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 def fit():
@@ -40,16 +42,22 @@ def fit():
 
     output_shape = Y_train.shape[1]
 
+    # caso recorrente
+    if MODEL in ["rnn", "lstm", "bilstm", "gru"]:
+        X_train = np.reshape(X_train, (X_train.shape[0], 1, X_train.shape[1]))
+        X_val = np.reshape(X_val, (X_val.shape[0], 1, X_val.shape[1]))
+        X_test = np.reshape(X_test, (X_test.shape[0], 1, X_test.shape[1]))
+
     params = {
         "input_shape": input_shape,
         "output_shape": output_shape,
         "neurons": 64,  # 128, 256
         "activation": "elu",
         "batch_size": 128,
-        "epochs": 3,
+        "epochs": 5,
         "optimizer": Adam,
         "learning_rate": 0.001 * 1.0,
-        "model": "mlp_1_hidden",
+        "model": "rnn",
     }
 
     if MODEL != "elm" and MODEL != "esn":
@@ -59,6 +67,14 @@ def fit():
             params["model"] = "mlp_2_hidden"
         elif MODEL == "rbf":
             params["model"] = "rbf"
+        elif MODEL == "rnn":
+            params["model"] = "rnn"
+        elif MODEL == "lstm":
+            params["model"] = "lstm"
+        elif MODEL == "bilstm":
+            params["model"] = "bilstm"
+        elif MODEL == "gru":
+            params["model"] = "gru"
         elif MODEL == "cnn_like_alexnet":
             params["model"] = "cnn_like_alexnet"
 
@@ -96,14 +112,24 @@ def model_fit(X_train, Y_train, X_val, Y_val, params):
         modelo, _ = mlp_2_hidden.model(params)
     elif params["model"] == "rbf":
         modelo, _ = rbf.model(params, X_train)
+    elif params["model"] == "rnn":
+        modelo, _ = rnn.model(params)
+    elif params["model"] == "lstm":
+        modelo, _ = lstm.model(params)
+    elif params["model"] == "bilstm":
+        modelo, _ = bilstm.model(params)
+    elif params["model"] == "gru":
+        modelo, _ = gru.model(params)
     elif params["model"] == "cnn_like_alexnet":
         modelo, _ = cnn_like_alexnet.model(params)
     elif params["model"] == "alexnet_optimization":
         modelo, _ = alexnet_optimization.model(params)
 
-    learning_rate = talos.utils.lr_normalizer(
+    """ learning_rate = talos.utils.lr_normalizer(
         params["learning_rate"], params["optimizer"]
-    )
+    ) """
+
+    learning_rate = params["learning_rate"]
 
     if params["optimizer"] == SGD:
         optimizer = SGD(lr=learning_rate, momentum=params["momentum"])
@@ -156,6 +182,10 @@ if __name__ == "__main__":
             "esn",
             "elm",
             "cnn_like_alexnet",
+            "rnn",
+            "lstm",
+            "bilstm",
+            "gru",
         ],
     )
     parser.add_argument(

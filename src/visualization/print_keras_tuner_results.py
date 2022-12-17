@@ -22,7 +22,17 @@ def main():
     df = pd.read_csv(path_to_data)
 
     print(df.sort_values(by="val_loss", ascending=True))
-    print("Correlação\n", df.corrwith(df.val_loss, method="kendall"))
+    print(
+        "Correlação\n",
+        df.replace("elu", 0)
+        .replace("relu", 1)
+        .replace("rmsprop", 0)
+        .replace("sgd", 1)
+        .replace("adam", 2)
+        .replace(True, 1)
+        .replace(False, 0)
+        .corrwith(df.val_loss, method="kendall"),
+    )
 
     df = df.drop(columns=["id", "accuracy", "val_accuracy"])
     cols = df.columns

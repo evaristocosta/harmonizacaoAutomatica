@@ -1,4 +1,5 @@
 import sys
+
 sys.path.insert(1, "/home/lucas/harmonizacaoAutomatica/src/")
 
 import gc
@@ -13,7 +14,6 @@ import tensorflow as tf
 from tensorflow.keras.optimizers import SGD, Adam
 from tensorflow.keras.callbacks import Callback
 from keras.callbacks import ModelCheckpoint, CSVLogger
-import talos
 from npy_append_array import NpyAppendArray
 
 from load_data import carrega, separa, carrega_arquivo
@@ -54,6 +54,10 @@ parser.add_argument(
         "resnet101",
         "inceptionv3",
         "densenet201",
+        "rnn",
+        "lstm",
+        "bilstm",
+        "gru",
     ],
 )
 parser.add_argument(
@@ -109,18 +113,28 @@ def cross_val():
     # X_train, Y_train, X_val, Y_val, X_test, Y_test = separa(X, Y, ratio_train=0.7)
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
 
-    input_shape = X_train.shape[1:]
+    if MODEL != "cnn_like_alexnet":
+        input_shape = X_train.shape[1]
+    else:
+        input_shape = X_train.shape[1:]
+
     output_shape = Y_train.shape[1]
+
+    # caso recorrente
+    if MODEL in ["rnn", "lstm", "bilstm", "gru"]:
+        X_train = np.reshape(X_train, (X_train.shape[0], 1, X_train.shape[1]))
+        X_val = np.reshape(X_val, (X_val.shape[0], 1, X_val.shape[1]))
+        X_test = np.reshape(X_test, (X_test.shape[0], 1, X_test.shape[1]))
 
     params = {
         "input_shape": input_shape,
         "output_shape": output_shape,
         "neurons": NEURONS,  # 64, 128, 256
         "activation": "sigmoid",
-        "batch_size": 512,
-        "epochs": 2,
-        "optimizer": Adam,
-        "learning_rate": 0.001 * 100.0,
+        "batch_size": 1,
+        "epochs": 200,
+        "optimizer": SGD,
+        "learning_rate": 0.1,
         "model": MODEL,
         "ensemble_models": ["mlp_1_hidden", "mlp_2_hidden"],
         "ensemble_voting": "wta",
@@ -142,6 +156,14 @@ def cross_val():
             modelo, pesos = mlp_2_hidden.model(params)
         elif params["model"] == "rbf":
             modelo, pesos = rbf.model(params, X_train)
+        elif params["model"] == "rnn":
+            modelo, pesos = rnn.model(params)
+        elif params["model"] == "lstm":
+            modelo, pesos = lstm.model(params)
+        elif params["model"] == "bilstm":
+            modelo, pesos = bilstm.model(params)
+        elif params["model"] == "gru":
+            modelo, pesos = gru.model(params)
         elif params["model"] == "cnn_like_alexnet":
             modelo, pesos = cnn_like_alexnet.model(params)
         elif params["model"] in ["vgg16", "resnet101", "inceptionv3", "densenet201"]:
@@ -152,11 +174,7 @@ def cross_val():
 
         modelo.compile(
             loss="categorical_crossentropy",
-            optimizer=params["optimizer"](
-                lr=talos.utils.lr_normalizer(
-                    params["learning_rate"], params["optimizer"]
-                )
-            ),
+            optimizer=params["optimizer"](learning_rate=params["learning_rate"]),
             metrics=["accuracy"],
             # run_eagerly=True,  # https://stackoverflow.com/a/67138072
         )
