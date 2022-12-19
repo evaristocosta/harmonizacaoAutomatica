@@ -1,5 +1,6 @@
 import sys
-sys.path.insert(1, "/home/lucas/harmonizacaoAutomatica/src/")
+
+sys.path.insert(1, "/home/ubuntu/harmonizacaoAutomatica/src/")
 
 import argparse
 import numpy as np
