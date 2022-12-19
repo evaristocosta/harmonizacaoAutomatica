@@ -74,6 +74,9 @@ def processamento_one_hot(arquivos_csv, nome="vetor"):
             compasso_anterior = compasso
 
         # ultima sequencia de notas do ultimo compasso da musica atual
+        if len(sequencia_notas) == 0:
+            continue
+
         sequencia_notas = np.sum(sequencia_notas, axis=0)
 
         # normaliza o vetor
