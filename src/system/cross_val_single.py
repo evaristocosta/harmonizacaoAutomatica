@@ -23,7 +23,7 @@ from analysis.performance_measures import (
     calc_log_loss,
 )
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 gpus = tf.config.list_physical_devices("GPU")
 if gpus:
     try:
@@ -56,6 +56,10 @@ parser.add_argument(
         "resnet101",
         "inceptionv3",
         "densenet201",
+        "rnn",
+        "lstm",
+        "bilstm",
+        "gru",
     ],
 )
 parser.add_argument(
@@ -135,25 +139,50 @@ def cross_val_single():
 
     X_train, Y_train, X_val, Y_val, X_test, Y_test = carrega_arquivo()
 
-    input_shape = X_train.shape[1:]
+    if MODEL != "cnn_like_alexnet":
+        input_shape = X_train.shape[1]
+    else:
+        input_shape = X_train.shape[1:]
+
     output_shape = Y_train.shape[1]
+
+    # caso recorrente
+    if MODEL in ["rnn", "lstm", "bilstm", "gru"]:
+        X_train = np.reshape(X_train, (X_train.shape[0], 1, X_train.shape[1]))
+        X_val = np.reshape(X_val, (X_val.shape[0], 1, X_val.shape[1]))
+        X_test = np.reshape(X_test, (X_test.shape[0], 1, X_test.shape[1]))
+
+    # params = {
+    #     "input_shape": input_shape,
+    #     "output_shape": output_shape,
+    #     "neurons": NEURONS,  # 64, 128, 256
+    #     "activation": "elu",
+    #     "dropout": 0.5,
+    #     "layer_4": False,
+    #     "dense_1": 1024,
+    #     "dense_2": 1024,
+    #     "batch_size": BATCH,
+    #     "epochs": EPOCH,
+    #     "optimizer": OPTIMIZER,
+    #     "learning_rate": LR * 100.0,
+    #     "model": MODEL,
+    #     "ensemble_models": ["mlp_1_hidden", "mlp_2_hidden", "rbf", "esn", "elm"],
+    #     "ensemble_voting": "majority",
+    #     "application": MODEL,
+    # }
 
     params = {
         "input_shape": input_shape,
         "output_shape": output_shape,
         "neurons": NEURONS,  # 64, 128, 256
-        "activation": "elu",
-        "dropout": 0.5,
-        "layer_4": False,
-        "dense_1": 1024,
-        "dense_2": 1024,
-        "batch_size": BATCH,
-        "epochs": EPOCH,
-        "optimizer": OPTIMIZER,
-        "learning_rate": LR * 100.0,
+        "activation": "sigmoid",
+        "batch_size": 1,
+        "epochs": 200,
+        "optimizer": SGD,
+        "learning_rate": 0.1,
         "model": MODEL,
-        "ensemble_models": ["mlp_1_hidden", "mlp_2_hidden", "rbf", "esn", "elm"],
-        "ensemble_voting": "majority",
+        "ensemble_models": ["mlp_1_hidden", "mlp_2_hidden"],
+        "ensemble_voting": "wta",
         "application": MODEL,
     }
 
@@ -171,6 +200,14 @@ def cross_val_single():
             modelo, pesos = mlp_2_hidden.model(params)
         elif params["model"] == "rbf":
             modelo, pesos = rbf.model(params, X_train)
+        elif params["model"] == "rnn":
+            modelo, pesos = rnn.model(params)
+        elif params["model"] == "lstm":
+            modelo, pesos = lstm.model(params)
+        elif params["model"] == "bilstm":
+            modelo, pesos = bilstm.model(params)
+        elif params["model"] == "gru":
+            modelo, pesos = gru.model(params)
         elif params["model"] == "cnn_like_alexnet":
             modelo, pesos = cnn_like_alexnet.model(params)
         elif params["model"] == "alexnet":
