@@ -16,7 +16,7 @@ This work is the result of studies developed during [**Lucas Costa's**](http://l
 
 ## How to use
 
-DYou must create a directory in the project root called `data` and inside it, another `raw` directory containing all the songs in CSV format according to the [**CSV Leadsheet Database**](http://marg.snu.ac.kr/chord_generation/) structure.
+You must create a directory in the project root called `data` and inside it, another `raw` directory containing all the songs in CSV format according to the [**CSV Leadsheet Database**](http://marg.snu.ac.kr/chord_generation/) structure.
 
 The following steps, in order, are:
 - Preprocessing:
@@ -41,9 +41,11 @@ The following steps, in order, are:
 
 ## Related works
 
-> COSTA, Lucas F. P.; OGOSHI, André Y. C.; MARTINS, Marcella S. R.; SIQUEIRA, Hugo V. Developing a Measure Image and Applying to Deep Learning. Music Encoding Conference (MEC), Halifax, Canada, 2022. - Accepted to be published in May 22, 2022.
+> COSTA, Lucas F. P. et al. Neural Networks And Ensemble Based Architectures To Automatic Musical Harmonization: a performance comparison. Applied Artificial Intelligence, \[S.L.\], v. 37, n. 1, p. 844-858, 11 mar. 2023. Informa UK Limited.
 
-> Lucas F. P. Costa, Tathiana M. Barchi, Erikson F. de Morais, Andrés E. Coca, Marcella S. R. Martins and Hugo V. Siqueira. Neural Networks To Automatic Musical Harmonization: A Performance Comparison. NÃO PUBLICADO - EM CONSTRUÇÃO.
+> COSTA, Lucas Francesco Piccioni. Redes neurais artificiais para geração de acordes em melodias musicais. 2022. Dissertação (Mestrado em Ciência da Computação) - Universidade Tecnológica Federal do Paraná, Ponta Grossa, 2022.
+
+> COSTA, Lucas F. P.; OGOSHI, André Y. C.; MARTINS, Marcella S. R.; SIQUEIRA, Hugo V. Developing a Measure Image and Applying to Deep Learning. Music Encoding Conference (MEC), Halifax, Canada, 2022. - Accepted to be published in May 22, 2022.
 
 > COSTA, Lucas. Harmonização Musical Automática Baseada em Redes Neurais Artificiais. 2019. 54 f. Trabalho de Conclusão de Curso – Curso de Engenharia de Computação, Universidade Tecnológica Federal do Paraná. Toledo, 2019.
 
