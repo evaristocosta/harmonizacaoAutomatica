@@ -1,6 +1,6 @@
 import sys
 
-sys.path.insert(1, "/home/ubuntu/harmonizacaoAutomatica/src/")
+sys.path.insert(1, "/home/lucas/harmonizacaoAutomatica/src/")
 
 import gc
 import json

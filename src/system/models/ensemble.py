@@ -1,6 +1,6 @@
 import sys
 
-sys.path.insert(1, "/home/ubuntu/harmonizacaoAutomatica/src/")
+sys.path.insert(1, "/home/lucas/harmonizacaoAutomatica/src/")
 
 import argparse
 import numpy as np
@@ -41,14 +41,20 @@ class Ensemble:
 
     def predict(self, X):
         modelos = []
+        Xzes = []
         # carregar modelos
         for selecao in self.selecoes:
             modelos.append(return_model_by_name(selecao))
+            Xzes.append(
+                X
+                if selecao not in ["rnn", "lstm", "bilstm", "gru"]
+                else np.reshape(X, (X.shape[0], 1, X.shape[1]))
+            )
 
         predicoes = []
 
-        for modelo in modelos:
-            predicoes.append(np.squeeze(np.asarray(modelo.predict(X))))
+        for X1, modelo in zip(Xzes, modelos):
+            predicoes.append(np.squeeze(np.asarray(modelo.predict(X1))))
 
         # redefine pra iteracao
         predicoes = np.transpose(np.array(predicoes), (1, 0, 2))

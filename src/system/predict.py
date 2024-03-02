@@ -95,6 +95,9 @@ def predict_single(DATE, PRINT_CHORDS):
             X = np.load(f"data/encoded/{nome}_entrada.npy", mmap_mode="r")
             Y = np.load(f"data/encoded/{nome}_saida.npy", mmap_mode="r")
 
+            # caso da lstm
+            # X = np.reshape(X, (X.shape[0], 1, X.shape[1]))
+
             predicao = modelo.predict(X, verbose=0)
             print_basic_performance(Y, predicao)
 

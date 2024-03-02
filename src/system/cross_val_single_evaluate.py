@@ -1,6 +1,6 @@
 import sys
 
-sys.path.insert(1, "/home/ubuntu/harmonizacaoAutomatica/src/")
+sys.path.insert(1, "/home/lucas/harmonizacaoAutomatica/src/")
 
 import time
 import os
@@ -29,6 +29,10 @@ parser.add_argument(
         "resnet101",
         "inceptionv3",
         "densenet201",
+        "rnn",
+        "lstm",
+        "bilstm",
+        "gru",
     ],
 )
 parser.add_argument("--time", help="Timestamp", default=str(int(time.time())))

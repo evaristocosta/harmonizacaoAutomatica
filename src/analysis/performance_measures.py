@@ -68,6 +68,7 @@ def calc_average_from_date(date):
         )
 
     print("\n\nMédia:\n", resultados.mean())
+    return resultados.mean(), experiment, date
 
 
 # loss
